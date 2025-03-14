@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Movements</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            background-color: #f8fafc;
+        }
+        h2 {
+            text-align: center;
+            color: #1e293b;
+            font-size: 28px;
+            font-weight: 600;
+            padding: 40px 0 30px;
+            margin: 0;
+        }
+        table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin: 0 auto 24px;
+            background: white;
+            border-collapse: separate;
+            width: 94%;
+            max-width: 1200px;
+        }
+        th, td {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+            text-align: center;
+        }
+        th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        .button-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 0 3%;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 15px;
+            text-decoration: none;
+        }
+        a[href*="stock_movement"] {
+            background-color: #3b82f6;
+            color: white;
+        }
+        a[href*="inventory_list"] {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        a[href*="stock_movement"]:hover {
+            background-color: #2563eb;
+        }
+        a[href*="inventory_list"]:hover {
+            background-color: #cbd5e1;
+        }
+        .movement-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .IN { background-color: #dcfce7; color: #166534; }
+        .OUT { background-color: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <h2>Stock Movements</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Type</th>
+                <th>Quantity</th>
+                <th>Date</th>
+                <th>Vendor</th>
+                <th>Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movement in stock_movements %}
+            <tr>
+                <td>{{ movement.id }}</td>
+                <td>{{ movement.item.name }}</td>
+                <td>
+                    <span class="movement-type {{ movement.movement_type }}">
+                        {{ movement.movement_type }}
+                    </span>
+                </td>
+                <td>{{ movement.quantity }}</td>
+                <td>{{ movement.date|date:"M d, Y" }}</td>
+                <td>{{ movement.vendor|default:"-" }}</td>
+                <td>{{ movement.purpose|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align:center; color: #64748b;">
+                    No stock movements recorded
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="button-container">
+        <a href="{% url 'stock_movement' %}" class="btn">
+            <i class="fas fa-plus"></i> Add Movement
+        </a>
+        <a href="{% url 'inventory_list' %}" class="btn">
+            <i class="fas fa-boxes"></i> View Inventory
+        </a>
+    </div>
+
+</body>
+</html>

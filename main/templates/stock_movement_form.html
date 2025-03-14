@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Movement</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h2>Stock Movement</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="item">Select Item:</label>
+        <select id="item" name="item">
+            {% for item in items %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="movement_type">Movement Type:</label>
+        <select id="movement_type" name="movement_type">
+            <option value="INWARD">INWARD</option>
+            <option value="OUTWARD">OUTWARD</option>
+        </select>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" required>
+
+        <label for="vendor">Vendor:</label>
+        <input type="text" id="vendor" name="vendor">
+
+        <label for="purpose">Purpose:</label>
+        <select id="purpose" name="purpose">
+            <option value="Production">Production</option>
+            <option value="Testing">Testing</option>
+            <option value="Deployment">Deployment</option>
+            <option value="Sales">Sales</option>
+            <option value="Return">Return</option>
+        </select>
+        <% if user.is_superuser %>
+            <button type="submit">Submit</button>
+        <%endif%>
+        <a href="{% url 'stock_list' %}">Cancel</a>
+    </form>
+</body>
+</html>

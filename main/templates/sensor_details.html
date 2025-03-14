@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            background-color: #f8fafc;
+        }
+        h2 {
+            text-align: center;
+            color: #1e293b;
+            font-size: 28px;
+            font-weight: 600;
+            padding: 40px 0 30px;
+            margin: 0;
+        }
+        table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin: 0 auto 24px;
+            background: white;
+            border-collapse: separate;
+            width: 94%;
+            max-width: 800px;
+        }
+        th, td {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+            text-align: center;
+        }
+        th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 15px;
+            text-decoration: none;
+            background-color: #3b82f6;
+            color: white;
+            margin: 24px auto;
+        }
+        .btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .material-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background-color: #e2e8f0;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .empty-state {
+            text-align: center;
+            color: #64748b;
+            padding: 40px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>{{ sensor.name }} Production History</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Quantity Used</th>
+                <th>Production Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for build in sensor_builds %}
+                {% for component in build.components.all %}
+                <tr>
+                    <td>
+                        <span class="material-badge">
+                            <i class="fas fa-cube"></i>
+                            {{ component.component.name }}
+                        </span>
+                    </td>
+                    <td>{{ component.quantity_used }}</td>
+                    <td>{{ build.build_date|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+            {% empty %}
+            <tr>
+                <td colspan="3" class="empty-state">
+                    <i class="fas fa-box-open"></i><br>
+                    No production records found
+                </td>
+            </tr>   
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'inventory_list' %}" class="btn">
+        <i class="fas fa-arrow-left"></i>
+        Back to Inventory
+    </a>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+</head>
+<body>
+    <h2>User Management</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Is Admin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.is_superuser }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>
