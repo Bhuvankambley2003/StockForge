@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Assembly | StockForge</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #dbeafe;
+            --secondary: #7c3aed;
+            --secondary-dark: #6d28d9;
+            --secondary-light: #ede9fe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 4px;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* Light Mode Theme Variables (Default) */
+            --bg-main: var(--gray-50);
+            --bg-card: white;
+            --bg-header: var(--gray-100);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-700);
+            --text-muted: var(--gray-500);
+            --border-light: var(--gray-200);
+            --border-lighter: var(--gray-100);
+        }
+        
+        /* Dark Mode Theme */
+        [data-theme="dark"] {
+            --bg-main: #121826;
+            --bg-card: #1c2536;
+            --bg-header: #1e2a3b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-light: #334155;
+            --border-lighter: #1e293b;
+            --hover-bg: #1e293b;
+            
+            /* Dark mode component colors */
+            --primary-light: rgba(59, 130, 246, 0.2);
+            --secondary-light: rgba(124, 58, 237, 0.2);
+            --success-light: rgba(16, 185, 129, 0.2);
+            --warning-light: rgba(245, 158, 11, 0.2);
+            --danger-light: rgba(239, 68, 68, 0.2);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0;
+            margin-bottom: 32px;
+        }
+        
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius);
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .header-text p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+        
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .breadcrumbs a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .breadcrumbs a:hover {
+            color: var(--primary);
+        }
+        
+        .breadcrumbs i {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        
+        .breadcrumbs .current {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .page-container {
+            display: flex;
+            width: 100%;
+            gap: 32px;
+            margin: 0 auto 48px;
+        }
+        
+        .form-container {
+            flex: 1;
+            min-width: 0; /* Prevents flex item from overflowing */
+        }
+        
+        .dashboard-container {
+            width: 340px;
+            flex-shrink: 0;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .card-header {
+            padding: 20px 24px;
+            background-color: var(--bg-header);
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            font-size: 15px;
+            transition: all 0.2s;
+            color: var(--text-primary);
+            background-color: var(--bg-card);
+        }
+        
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .form-hint {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        #components {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .component-card {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 16px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--bg-card);
+        }
+        
+        .component-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .component-card.selected {
+            background-color: var(--primary-light);
+            border-color: var(--primary);
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .component-details {
+            flex: 1;
+        }
+        
+        .component-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        
+        .component-stock {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .component-stock-high {
+            color: var(--success);
+        }
+        
+        .component-stock-medium {
+            color: var(--warning);
+        }
+        
+        .component-stock-low {
+            color: var(--danger);
+        }
+        
+        input[type="number"][name="quantities"] {
+            width: 80px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-outline {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--border-lighter);
+            border-color: var(--text-muted);
+        }
+        
+        /* Dashboard styles */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+        }
+        
+        .search-box input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        
+        .component-list {
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        
+        .component-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .component-list::-webkit-scrollbar-track {
+            background: var(--border-lighter);
+            border-radius: var(--radius-full);
+        }
+        
+        .component-list::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: var(--radius-full);
+        }
+        
+        .component-list::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        
+        .component-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+        
+        .component-item:hover {
+            background-color: var(--border-lighter);
+        }
+        
+        .component-item:last-child {
+            border-bottom: none;
+        }
+        
+        .component-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .component-name i {
+            width: 28px;
+            height: 28px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .component-stock {
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            padding: 4px 12px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .stock-high {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+        
+        .stock-medium {
+            background-color: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .stock-low {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+        
+        .error-message {
+            background-color: var(--danger-light);
+            color: var(--danger);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 32px;
+        }
+        
+        .error-icon {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+        
+        .summary-bar {
+            background-color: var(--secondary-light);
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .summary-text {
+            font-weight: 500;
+            color: var(--secondary);
+            font-size: 15px;
+        }
+        
+        .summary-count {
+            font-weight: 600;
+            color: var(--secondary);
+            background-color: var(--bg-card);
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+        }
+        
+        @media (max-width: 1024px) {
+            .page-container {
+                flex-direction: column;
+            }
+            
+            .dashboard-container {
+                width: 100%;
+                margin-top: 24px;
+            }
+            
+            .header-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            #components {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Floating Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            border: none;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .theme-toggle i {
+            font-size: 20px;
+            transition: transform 0.5s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .theme-toggle {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <div class="header-title">
+                <div class="header-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Equipment Assembly</h1>
+                    <p>Build and configure new equipment using available components</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="breadcrumbs">
+            <a href="{% url 'inventory_list' %}">Inventory</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="{% url 'stock_list' %}">Production</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="current">Equipment Assembly</span>
+        </div>
+        
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle error-icon"></i>
+            <div>
+                <strong>Production Error:</strong><br>
+                {{ error }}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="page-container">
+            <div class="form-container">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-microchip"></i>
+                            Build Specification
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" id="buildForm">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label" for="sensor_name">
+                                    <i class="fas fa-tag"></i>
+                                    Equipment Name
+                                </label>
+                                <input type="text" id="sensor_name" name="sensor_name" required placeholder="Enter equipment name">
+                                <div class="form-hint">Provide a descriptive name for this equipment</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="part_number">
+                                    <i class="fas fa-barcode"></i>
+                                    Part Number
+                                </label>
+                                <input type="text" id="part_number" name="part_number" required placeholder="Format: SNS-XXXX">
+                                <div class="form-hint">Enter a unique identifier for this equipment</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="number_of_sensors">
+                                    <i class="fas fa-cube"></i>
+                                    Production Quantity
+                                </label>
+                                <input type="number" id="number_of_sensors" name="number_of_sensors" required min="1" value="1" oninput="updateSummary()">
+                                <div class="form-hint">How many units of this equipment to produce</div>
+                            </div>
+
+                            <div class="summary-bar">
+                                <span class="summary-text">
+                                    <i class="fas fa-clipboard-check"></i> 
+                                    Selected components:
+                                </span>
+                                <span class="summary-count" id="selectedCount">0</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-box-open"></i>
+                                    Required Components
+                                </label>
+                                <div id="components">
+                                    {% for item in raw_materials %}
+                                        <div class="component-card" data-id="{{ item.id }}">
+                                            <input type="checkbox" id="component_{{ item.id }}" name="components" value="{{ item.id }}" class="component-checkbox">
+                                            <div class="component-details">
+                                                <div class="component-name">{{ item.name }}</div>
+                                                <div class="component-stock {% if item.total_stock > 20 %}component-stock-high{% elif item.total_stock > 5 %}component-stock-medium{% else %}component-stock-low{% endif %}">
+                                                    <i class="fas fa-cubes"></i> In stock: {{ item.total_stock }} pcs
+                                                </div>
+                                            </div>
+                                            <input type="number" name="quantities" 
+                                                placeholder="Qty" 
+                                                min="1"
+                                                value=""
+                                                class="quantity-input"
+                                                data-stock="{{ item.total_stock }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-cogs"></i> Start Production
+                                </button>
+                                <a href="{% url 'stock_list' %}" class="btn btn-outline">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Component Stock Dashboard -->
+            <div class="dashboard-container">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-boxes"></i> Component Inventory
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="componentSearch" placeholder="Search components..." onkeyup="filterComponents()">
+                        </div>
+                        
+                        <div class="component-list">
+                            {% for item in raw_materials %}
+                                <div class="component-item" data-name="{{ item.name|lower }}">
+                                    <div class="component-name">
+                                        <i class="fas fa-microchip"></i>
+                                        {{ item.name }}
+                                    </div>
+                                    <div class="component-stock {% if item.total_stock > 20 %}stock-high{% elif item.total_stock > 5 %}stock-medium{% else %}stock-low{% endif %}">
+                                        <i class="fas fa-cubes"></i>
+                                        {{ item.total_stock }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script>
+        // Theme Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const htmlElement = document.documentElement;
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+
+            // Check for saved theme preference or system preference
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            // Set initial theme
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                htmlElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+
+            // Toggle theme on button click
+            themeToggle.addEventListener('click', function() {
+                if (htmlElement.getAttribute('data-theme') === 'dark') {
+                    htmlElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                } else {
+                    htmlElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                }
+                themeIcon.style.transform = 'rotate(360deg)';
+                setTimeout(() => {
+                    themeIcon.style.transform = 'rotate(0)';
+                }, 500);
+            });
+        });
+
+        // Function to filter components in the dashboard
+        function filterComponents() {
+            const searchInput = document.getElementById('componentSearch');
+            const filter = searchInput.value.toLowerCase();
+            const components = document.querySelectorAll('.component-item');
+            
+            components.forEach(component => {
+                const name = component.getAttribute('data-name');
+                if (name.includes(filter)) {
+                    component.style.display = "";
+                } else {
+                    component.style.display = "none";
+                }
+            });
+        }
+
+        // Function to update the selected components count
+        function updateSummary() {
+            const selectedComponents = document.querySelectorAll('input[name="components"]:checked').length;
+            document.getElementById('selectedCount').textContent = selectedComponents;
+        }
+
+        // Handle component cards selection
+        document.querySelectorAll('.component-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (e.target.type !== 'checkbox' && e.target.type !== 'number') {
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected', checkbox.checked);
+                    updateSummary();
+                }
+            });
+        });
+
+        // Enhance UX by auto-selecting checkbox when quantity is entered
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const checkbox = this.parentElement.querySelector('input[type="checkbox"]');
+                const card = this.closest('.component-card');
+                
+                if (this.value > 0) {
+                    checkbox.checked = true;
+                    card.classList.add('selected');
+                } else {
+                    checkbox.checked = false;
+                    card.classList.remove('selected');
+                }
+                
+                updateSummary();
+                
+                // Validate against available stock
+                const availableStock = parseInt(this.getAttribute('data-stock'));
+                const requestedQty = parseInt(this.value) || 0;
+                
+                if (requestedQty > availableStock) {
+                    this.style.color = 'var(--danger)';
+                    this.style.borderColor = 'var(--danger)';
+                } else {
+                    this.style.color = '';
+                    this.style.borderColor = '';
+                }
+            });
+        });
+        
+        // Add selection styling when checkbox is clicked directly
+        document.querySelectorAll('.component-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const card = this.closest('.component-card');
+                card.classList.toggle('selected', this.checked);
+                updateSummary();
+            });
+        });
+        
+        // Form validation
+        document.getElementById('buildForm').addEventListener('submit', function(e) {
+            const selectedComponents = document.querySelectorAll('input[name="components"]:checked').length;
+            
+            if (selectedComponents === 0) {
+                e.preventDefault();
+                alert('Please select at least one component for the build.');
+                return false;
+            }
+            
+            // Validate that all selected components have quantities
+            let valid = true;
+            document.querySelectorAll('input[name="components"]:checked').forEach(checkbox => {
+                const card = checkbox.closest('.component-card');
+                const quantityInput = card.querySelector('.quantity-input');
+                
+                if (!quantityInput.value || parseInt(quantityInput.value) < 1) {
+                    valid = false;
+                    quantityInput.style.borderColor = 'var(--danger)';
+                }
+            });
+            
+            if (!valid) {
+                e.preventDefault();
+                alert('Please specify quantities for all selected components.');
+                return false;
+            }
+        });
+        
+        // Initialize the summary
+        updateSummary();
+    </script>
+</body>
+</html>

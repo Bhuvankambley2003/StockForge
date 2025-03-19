@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sensor.name }} - Details | Inventory Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #dbeafe;
+            --secondary: #7c3aed;
+            --secondary-light: #ede9fe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 4px;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-700);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .sensor-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius);
+            background-color: var(--secondary-light);
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .page-title {
+            margin: 0;
+        }
+        
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin: 0 0 4px;
+        }
+        
+        .page-subtitle {
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 14px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid var(--gray-200);
+            color: var(--gray-700);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--gray-50);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+        
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        .sensor-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .detail-item {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .detail-label {
+            color: var(--gray-500);
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+        
+        .badge-secondary {
+            background-color: var(--secondary-light);
+            color: var(--secondary);
+        }
+        
+        .badge-primary {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .component-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .component-table th,
+        .component-table td {
+            padding: 16px;
+            font-size: 14px;
+            text-align: left;
+        }
+        
+        .component-table th {
+            background-color: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-600);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .component-table th:first-child {
+            border-top-left-radius: var(--radius);
+        }
+        
+        .component-table th:last-child {
+            border-top-right-radius: var(--radius);
+        }
+        
+        .component-table tr:last-child td:first-child {
+            border-bottom-left-radius: var(--radius);
+        }
+        
+        .component-table tr:last-child td:last-child {
+            border-bottom-right-radius: var(--radius);
+        }
+        
+        .component-table td {
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .component-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .component-table tr:hover td {
+            background-color: var(--gray-50);
+        }
+        
+        .component-icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .component-icon i {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+            background-color: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .component-name {
+            font-weight: 500;
+        }
+        
+        .quantity-cell {
+            font-weight: 600;
+        }
+        
+        .date-cell {
+            color: var(--gray-500);
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            color: var(--gray-500);
+            text-align: center;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--gray-300);
+        }
+        
+        .empty-state-message {
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+        
+        /* Breadcrumbs */
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .breadcrumbs a {
+            color: var(--gray-500);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .breadcrumbs a:hover {
+            color: var(--primary);
+        }
+        
+        .breadcrumbs i {
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+        
+        .breadcrumbs .current {
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .sensor-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <a href="{% url 'inventory_list' %}">Inventory</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="{% url 'inventory_list' %}">Equipment</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="current">{{ sensor.name }}</span>
+        </div>
+    
+        <!-- Page header -->
+        <div class="page-header">
+            <div class="header-content">
+                <div class="sensor-icon">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <div class="page-title">
+                    <h1>{{ sensor.name }}</h1>
+                    <p class="page-subtitle">
+                        Part Number: {{ sensor.part_number }} | Current Stock: 
+                        <span class="badge {% if sensor.total_stock > 10 %}badge-success{% elif sensor.total_stock > 0 %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ sensor.total_stock }} units
+                        </span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{% url 'inventory_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Inventory
+                </a>
+                <a href="{% url 'stock_movement' %}" class="btn btn-primary">
+                    <i class="fas fa-exchange-alt"></i>
+                    Adjust Stock
+                </a>
+            </div>
+        </div>
+        
+        <!-- Sensor details card -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Equipment Details
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="sensor-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Part Number</div>
+                        <div class="detail-value">{{ sensor.part_number }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">
+                            <span class="badge badge-secondary">
+                                <i class="fas fa-tag"></i>
+                                {{ sensor.get_category_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Available Stock</div>
+                        <div class="detail-value">
+                            <span class="badge {% if sensor.total_stock > 10 %}badge-success{% elif sensor.total_stock > 0 %}badge-warning{% else %}badge-danger{% endif %}">
+                                <i class="fas fa-cubes"></i>
+                                {{ sensor.total_stock }} units
+                            </span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Last Updated</div>
+                        <div class="detail-value">
+                            <i class="far fa-calendar-alt"></i>
+                            {% for build in sensor_builds %}
+                                {% if forloop.first %}
+                                {{ build.build_date|date:"M d, Y" }}
+                                {% endif %}
+                            {% empty %}
+                                N/A
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Components card -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-puzzle-piece"></i>
+                    Component Breakdown
+                </h2>
+            </div>
+            <div class="card-body">
+                {% if sensor_builds %}
+                    <table class="component-table">
+                        <thead>
+                            <tr>
+                                <th width="40%">Component</th>
+                                <th width="20%">Quantity Per Unit</th>
+                                <th width="20%">Production Date</th>
+                                <th width="20%">Total Used</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for build in sensor_builds %}
+                                {% for component in build.components.all %}
+                                <tr>
+                                    <td>
+                                        <div class="component-icon">
+                                            <i class="fas fa-microchip"></i>
+                                            <span class="component-name">{{ component.component.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="quantity-cell">{{ component.quantity_used }}</td>
+                                    <td class="date-cell">{{ build.build_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge badge-primary">
+                                            {{ component.quantity_used }} units
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p class="empty-state-message">No production records found for this equipment</p>
+                        <a href="{% url 'sensor_build' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Create Production Record
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

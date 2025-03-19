@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Deployments | StockForge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            /* Color palette */
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #dbeafe;
+            --secondary: #7c3aed;
+            --secondary-dark: #6d28d9;
+            --secondary-light: #ede9fe;
+            --success: #10b981;
+            --success-light: #dcfce7;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            
+            /* Spacing and sizing */
+            --radius-sm: 4px;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* Light Mode Theme Variables (Default) */
+            --bg-main: var(--gray-50);
+            --bg-card: white;
+            --bg-header: var(--gray-100);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-700);
+            --text-muted: var(--gray-500);
+            --border-light: var(--gray-200);
+            --border-lighter: var(--gray-100);
+            --hover-bg: var(--gray-50);
+            --input-bg: white;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --table-stripe: var(--gray-50);
+        }
+        
+        /* Dark Mode Theme */
+        [data-theme="dark"] {
+            --bg-main: #121826;
+            --bg-card: #1c2536;
+            --bg-header: #1e2a3b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-light: #334155;
+            --border-lighter: #1e293b;
+            --hover-bg: #1e293b;
+            --input-bg: #1c2536;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --table-stripe: rgba(30, 41, 59, 0.5);
+            
+            /* Dark mode adjusted component colors */
+            --primary-light: rgba(59, 130, 246, 0.2);
+            --success-light: rgba(16, 185, 129, 0.2);
+            --warning-light: rgba(245, 158, 11, 0.2);
+            --danger-light: rgba(239, 68, 68, 0.2);
+            --secondary-light: rgba(124, 58, 237, 0.2);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        .page-header {
+            padding: 32px 0 24px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius);
+            background-color: var(--secondary-light);
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--hover-bg);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            padding: 0;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .tab:hover:not(.active) {
+            color: var(--text-primary);
+            border-bottom-color: var(--border-light);
+        }
+        
+        .tab i {
+            margin-right: 8px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-card {
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: var(--text-muted);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            font-size: 15px;
+            transition: all 0.2s;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .error-message {
+            background-color: var(--danger-light);
+            color: var(--danger);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin: 20px auto;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+        
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+            background-color: var(--bg-header);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        
+        th, td {
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        th {
+            background-color: var(--bg-header);
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            white-space: nowrap;
+        }
+        
+        td {
+            border-bottom: 1px solid var(--border-lighter);
+            color: var(--text-secondary);
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: var(--table-stripe);
+        }
+        
+        tbody tr:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .status-form {
+            display: inline-block;
+            margin: 0;
+        }
+        
+        .status-select {
+            padding: 6px 32px 6px 12px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-light);
+            font-size: 13px;
+            background-color: var(--input-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+            min-width: 140px;
+        }
+        
+        .status-select:hover {
+            border-color: var(--text-muted);
+        }
+        
+        .status-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .status-DEPLOYED { 
+            background-color: var(--primary-light); 
+            color: var(--primary); 
+        }
+        
+        .status-RETURNED { 
+            background-color: var(--success-light); 
+            color: var(--success); 
+        }
+        
+        .status-SOLD { 
+            background-color: var(--secondary-light); 
+            color: var(--secondary); 
+        }
+        
+        .empty-state {
+            padding: 48px 0;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--border-light);
+        }
+        
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .empty-message {
+            max-width: 400px;
+            margin: 0 auto 24px;
+        }
+        
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px 0;
+            border-top: 1px solid var(--border-light);
+            margin-top: auto;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .footer-link:hover {
+            color: var(--primary);
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            border: none;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .theme-toggle i {
+            font-size: 20px;
+            transition: transform 0.5s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                -ms-overflow-style: -ms-autohiding-scrollbar;
+                padding-bottom: 5px;
+            }
+            
+            .tab {
+                padding: 12px 16px;
+            }
+            
+            .form-card {
+                padding: 24px;
+            }
+            
+            .theme-toggle {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="fas fa-satellite-dish"></i>
+                </div>
+                <div class="page-title">
+                    <h1>Sensor Deployments</h1>
+                    <p class="page-subtitle">Track and manage all deployed sensor units</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <a href="{% url 'inventory_list' %}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </header>
+        
+        <div class="content">
+            {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i> {{ error }}
+            </div>
+            {% endif %}
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="deployments">
+                    <i class="fas fa-list"></i> Deployment History
+                </div>
+                <div class="tab" data-tab="new">
+                    <i class="fas fa-plus"></i> New Deployment
+                </div>
+            </div>
+            
+            <div class="tab-content active" id="tab-deployments">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-rocket"></i> Active and Historical Deployments
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sensor</th>
+                                    <th>Company</th>
+                                    <th>Deployment Date</th>
+                                    <th>Expected Return</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for deployment in deployments %}
+                                <tr>
+                                    <td>{{ deployment.sensor.name }}</td>
+                                    <td>{{ deployment.company }}</td>
+                                    <td>{{ deployment.deployment_date|date:"M d, Y" }}</td>
+                                    <td>{{ deployment.expected_return_date|date:"M d, Y"|default:"-" }}</td>
+                                    <td>{{ deployment.quantity }}</td>
+                                    <td>
+                                        <form method="POST" action="{% url 'update_deployment_status' deployment.id %}" class="status-form">
+                                            {% csrf_token %}
+                                            <select name="status" class="status-select status-{{ deployment.status }}" onchange="this.form.submit()">
+                                                {% for value, display in deployment.STATUS_CHOICES %}
+                                                <option value="{{ value }}" {% if deployment.status == value %}selected{% endif %}>
+                                                    {{ display }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <i class="fas fa-satellite empty-icon"></i>
+                                            <h3 class="empty-title">No deployed sensors found</h3>
+                                            <p class="empty-message">Deploy your first sensor unit using the New Deployment tab above.</p>
+                                            <button class="btn btn-primary switch-tab" data-tab="new">
+                                                <i class="fas fa-plus"></i> Deploy New Sensor
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-new">
+                <div class="form-card">
+                    <h3 class="form-title"><i class="fas fa-rocket"></i> Deploy a New Sensor</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label><i class="fas fa-microchip"></i> Sensor Model</label>
+                            <select name="sensor" required>
+                                <option value="">Select Sensor Model</option>
+                                {% for sensor in sensors %}
+                                    <option value="{{ sensor.id }}">{{ sensor.name }} (Stock: {{ sensor.total_stock }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-building"></i> Company / Client</label>
+                            <input type="text" name="company" placeholder="Enter company name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Deployment Date</label>
+                            <input type="date" name="deployment_date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-check"></i> Expected Return Date</label>
+                            <input type="date" name="expected_return_date" placeholder="Leave blank for permanent deployment">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-cube"></i> Quantity to Deploy</label>
+                            <input type="number" name="quantity" min="1" value="1" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-rocket"></i> Deploy Sensor
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <div class="copyright">
+                © {% now "Y" %} StockForge. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="{% url 'inventory_list' %}" class="footer-link">Dashboard</a>
+                <a href="{% url 'stock_list' %}" class="footer-link">Stock Movements</a>
+                <a href="{% url 'generate_pdf' %}" class="footer-link">Export Report</a>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <script>
+        // Tab Switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show correct content
+                const tabName = tab.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById('tab-' + tabName).classList.add('active');
+            });
+        });
+        
+        // Button to switch tabs
+        document.querySelectorAll('.switch-tab').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.getAttribute('data-tab') === tabName) {
+                        tab.classList.add('active');
+                    }
+                });
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById('tab-' + tabName).classList.add('active');
+            });
+        });
+        
+        // Theme Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+            const htmlElement = document.documentElement;
+            
+            // Check for saved theme preference or use preferred color scheme
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                htmlElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+            
+            // Toggle theme
+            themeToggle.addEventListener('click', function() {
+                if (htmlElement.getAttribute('data-theme') === 'dark') {
+                    htmlElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                    themeIcon.style.transform = 'rotate(360deg)';
+                } else {
+                    htmlElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                    themeIcon.style.transform = 'rotate(360deg)';
+                }
+                
+                setTimeout(() => {
+                    themeIcon.style.transform = 'rotate(0)';
+                }, 500);
+            });
+            
+            // Set current date as default for deployment date
+            const today = new Date().toISOString().split('T')[0];
+            const deploymentDateInput = document.querySelector('input[name="deployment_date"]');
+            if (deploymentDateInput && !deploymentDateInput.value) {
+                deploymentDateInput.value = today;
+            }
+        });
+    </script>
+</body>
+</html>
