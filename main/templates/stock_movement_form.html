@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         :root {
+            /* Color Variables */
             --primary: #3b82f6;
             --primary-dark: #2563eb;
             --primary-light: #dbeafe;
@@ -30,77 +30,109 @@
             --gray-700: #334155;
             --gray-800: #1e293b;
             --gray-900: #0f172a;
+    
+            /* Border Radius */
             --radius-sm: 4px;
             --radius: 8px;
             --radius-lg: 12px;
             --radius-full: 9999px;
+    
+            /* Shadows */
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
             --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+            /* Light Mode Defaults */
+            --bg-main: var(--gray-50);
+            --bg-card: white;
+            --bg-header: var(--gray-100);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-700);
+            --text-muted: var(--gray-500);
+            --border-light: var(--gray-200);
+            --border-lighter: var(--gray-100);
         }
-        
+    
+        /* Dark Mode Overrides */
+        [data-theme="dark"] {
+            --bg-main: #121826;
+            --bg-card: #1c2536;
+            --bg-header: #1e2a3b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-light: #334155;
+            --border-lighter: #1e293b;
+    
+            /* Component Colors */
+            --primary-light: rgba(59, 130, 246, 0.2);
+            --secondary-light: rgba(124, 58, 237, 0.2);
+            --success-light: rgba(16, 185, 129, 0.2);
+            --warning-light: rgba(245, 158, 11, 0.2);
+            --danger-light: rgba(239, 68, 68, 0.2);
+        }
+    
+        /* Global Reset */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+    
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--gray-50);
-            color: var(--gray-700);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             line-height: 1.5;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        
+    
         .container {
             width: 100%;
-            max-width: 860px;
-            margin: 40px auto;
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 0 20px;
         }
-        
+    
+        /* Header */
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 24px 0;
             margin-bottom: 32px;
         }
-        
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
+    
         .header-icon {
-            width: 54px;
-            height: 54px;
+            width: 56px;
+            height: 56px;
             border-radius: var(--radius);
-            background-color: var(--primary-light);
-            color: var(--primary);
+            background-color: var(--secondary);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             box-shadow: var(--shadow);
         }
-        
-        .page-title h1 {
-            font-size: 24px;
+    
+        .header-text h1 {
+            font-size: 28px;
             font-weight: 700;
-            color: var(--gray-800);
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
-        
-        .page-subtitle {
-            font-size: 14px;
-            color: var(--gray-500);
+    
+        .header-text p {
+            color: var(--text-muted);
+            font-size: 15px;
         }
-        
+    
+        /* Breadcrumbs */
         .breadcrumbs {
             display: flex;
             align-items: center;
@@ -108,250 +140,80 @@
             margin-bottom: 24px;
             font-size: 14px;
         }
-        
+    
         .breadcrumbs a {
-            color: var(--gray-500);
+            color: var(--text-muted);
             text-decoration: none;
             transition: color 0.2s;
         }
-        
+    
         .breadcrumbs a:hover {
             color: var(--primary);
         }
-        
-        .breadcrumbs i {
-            color: var(--gray-400);
-            font-size: 12px;
-        }
-        
+    
         .breadcrumbs .current {
-            color: var(--gray-700);
+            color: var(--text-secondary);
             font-weight: 500;
         }
-        
+    
+        /* Cards */
         .card {
-            background: white;
+            background: var(--bg-card);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
             overflow: hidden;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
-        
+    
         .card-header {
             padding: 20px 24px;
-            background-color: var(--gray-50);
-            border-bottom: 1px solid var(--gray-200);
+            background-color: var(--bg-header);
+            border-bottom: 1px solid var(--border-light);
         }
-        
+    
         .card-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--gray-800);
+            color: var(--text-primary);
             margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
-        
+    
         .card-body {
             padding: 24px;
         }
-        
+    
+        /* Forms */
         .form-group {
             margin-bottom: 24px;
         }
-        
-        .form-group:last-child {
-            margin-bottom: 0;
-        }
-        
-        .form-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+    
+        label {
+            display: block;
             margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
             font-weight: 500;
-            color: var(--gray-700);
-            font-size: 14px;
         }
-        
-        .form-label i {
-            color: var(--gray-400);
-            font-size: 14px;
-        }
-        
-        .form-control {
+    
+        input[type="text"],
+        input[type="number"] {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid var(--gray-300);
+            border: 1px solid var(--border-light);
             border-radius: var(--radius);
             font-size: 15px;
-            color: var(--gray-800);
             transition: all 0.2s;
-            background-color: white;
+            color: var(--text-primary);
+            background-color: var(--bg-card);
         }
-        
-        .form-control:focus {
+    
+        input:focus {
             border-color: var(--primary);
             outline: none;
             box-shadow: 0 0 0 3px var(--primary-light);
         }
-        
-        .form-hint {
-            margin-top: 6px;
-            font-size: 12px;
-            color: var(--gray-500);
-        }
-        
-        .type-selector {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .type-option {
-            flex: 1;
-        }
-        
-        .type-radio {
-            display: none;
-        }
-        
-        .type-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            padding: 16px;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius);
-            font-weight: 500;
-            color: var(--gray-600);
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .type-label:hover {
-            border-color: var(--gray-400);
-            background-color: var(--gray-50);
-        }
-        
-        .type-radio:checked + .type-label.inward {
-            background-color: var(--success-light);
-            color: var(--success);
-            border-color: var(--success);
-        }
-        
-        .type-radio:checked + .type-label.outward {
-            background-color: var(--primary-light);
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .stock-details {
-            display: flex;
-            background-color: var(--gray-50);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-top: 8px;
-            margin-bottom: 24px;
-            border: 1px solid var(--gray-200);
-        }
-        
-        .stock-detail {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 0;
-        }
-        
-        .stock-detail:not(:last-child) {
-            border-right: 1px solid var(--gray-200);
-        }
-        
-        .stock-label {
-            font-size: 12px;
-            color: var(--gray-500);
-            margin-bottom: 4px;
-        }
-        
-        .stock-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-        
-        .high-stock {
-            color: var(--success);
-        }
-        
-        .medium-stock {
-            color: var(--warning);
-        }
-        
-        .low-stock {
-            color: var(--danger);
-        }
-        
-        .movement-summary {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius);
-            margin-top: 24px;
-            background-color: var(--gray-50);
-        }
-        
-        .summary-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-right: 16px;
-        }
-        
-        .inward-icon {
-            background-color: var(--success-light);
-            color: var(--success);
-        }
-        
-        .outward-icon {
-            background-color: var(--primary-light);
-            color: var(--primary);
-        }
-        
-        .summary-content {
-            flex: 1;
-        }
-        
-        .summary-title {
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: 2px;
-        }
-        
-        .summary-details {
-            font-size: 14px;
-            color: var(--gray-500);
-        }
-        
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--gray-200);
-        }
-        
+    
+        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -366,57 +228,191 @@
             text-decoration: none;
             border: none;
         }
-        
+    
         .btn-primary {
-            background-color: var(--primary);
+            background-color: var(--secondary);
             color: white;
         }
-        
+    
         .btn-primary:hover {
-            background-color: var(--primary-dark);
+            background-color: var(--secondary-dark);
             transform: translateY(-1px);
             box-shadow: var(--shadow-md);
         }
-        
+    
         .btn-outline {
-            background-color: white;
-            border: 1px solid var(--gray-300);
-            color: var(--gray-700);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
         }
-        
+    
         .btn-outline:hover {
-            background-color: var(--gray-50);
-            border-color: var(--gray-400);
+            background-color: var(--border-lighter);
+            border-color: var(--text-muted);
+        }
+    
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            border: none;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+    
+        .theme-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
         }
         
-        @media (max-width: 640px) {
-            .type-selector {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .stock-details {
-                flex-direction: column;
-            }
-            
-            .stock-detail {
-                padding: 12px 0;
-            }
-            
-            .stock-detail:not(:last-child) {
-                border-right: none;
-                border-bottom: 1px solid var(--gray-200);
-            }
-            
-            .form-actions {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .btn {
-                width: 100%;
-            }
+        .movement-selector {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
         }
+
+    /* Movement Option */
+        .movement-option {
+            flex: 1;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .movement-option:hover {
+            border-color: var(--gray-400);
+            background-color: var(--gray-50);
+        }
+
+        /* Inward Option */
+        .movement-option.inward.selected {
+            border-color: var(--success);
+            background-color: var(--success-light);
+        }
+
+        .movement-option.inward.selected i {
+            color: var(--success);
+        }
+
+        /* Outward Option */
+        .movement-option.outward.selected {
+            border-color: var(--danger);
+            background-color: var(--danger-light);
+        }
+
+        .movement-option.outward.selected i {
+            color: var(--danger);
+        }
+
+        /* Arrow Icons */
+        .movement-option i {
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .movement-option.inward i {
+            color: var(--gray-500);
+        }
+
+        .movement-option.outward i {
+            color: var(--gray-500);
+        }
+
+        /* Labels */
+        .movement-option span {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+        margin-bottom: 24px;
+    }
+
+    /* Form Label */
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+
+    .form-label i {
+        color: var(--gray-400);
+        font-size: 16px;
+    }
+
+    /* Dropdown Container */
+    .form-control {
+        position: relative;
+        width: 100%;
+    }
+
+    /* Dropdown Select */
+    select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        font-size: 15px;
+        color: var(--text-primary);
+        background-color: var(--bg-card);
+        appearance: none; /* Remove default arrow */
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    select:hover {
+        border-color: var(--gray-400);
+    }
+
+    select:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    /* Custom Dropdown Arrow */
+    .form-control::after {
+        content: "\f078"; /* Font Awesome chevron-down icon */
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        transform: translateY(-50%);
+        pointer-events: none; /* Ensure clicks pass through to the select */
+        color: var(--gray-500);
+        font-size: 14px;
+    }
+
+    /* Form Hint */
+    .form-hint {
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
     </style>
 </head>
 <body>
@@ -452,21 +448,17 @@
                 <form method="POST" id="stockMovementForm">
                     {% csrf_token %}
                     
-                    <div class="type-selector">
-                        <div class="type-option">
-                            <input type="radio" id="inward" name="movement_type" value="INWARD" class="type-radio" checked>
-                            <label for="inward" class="type-label inward">
-                                <i class="fas fa-arrow-circle-down"></i>
-                                Inward Movement
-                            </label>
+                    <div class="movement-selector">
+                        <!-- Inward Option -->
+                        <div class="movement-option inward" onclick="selectMovement('inward')">
+                            <i class="fas fa-arrow-up"></i> <!-- Upward arrow icon -->
+                            <span>Inward</span>
                         </div>
-                        
-                        <div class="type-option">
-                            <input type="radio" id="outward" name="movement_type" value="OUTWARD" class="type-radio">
-                            <label for="outward" class="type-label outward">
-                                <i class="fas fa-arrow-circle-up"></i>
-                                Outward Movement
-                            </label>
+                    
+                        <!-- Outward Option -->
+                        <div class="movement-option outward" onclick="selectMovement('outward')">
+                            <i class="fas fa-arrow-down"></i> <!-- Downward arrow icon -->
+                            <span>Outward</span>
                         </div>
                     </div>
                     
@@ -475,12 +467,16 @@
                             <i class="fas fa-box"></i>
                             Select Item
                         </label>
-                        <select id="item" name="item" class="form-control" onchange="updateItemInfo()">
-                            <option value="">-- Select an item --</option>
-                            {% for item in items %}
-                                <option value="{{ item.id }}" data-stock="{{ item.total_stock }}" data-category="{{ item.get_category_display }}">{{ item.name }} ({{ item.part_number }})</option>
-                            {% endfor %}
-                        </select>
+                        <div class="form-control">
+                            <select id="item" name="item" onchange="updateItemInfo()">
+                                <option value="">-- Select an item --</option>
+                                {% for item in items %}
+                                    <option value="{{ item.id }}" data-stock="{{ item.total_stock }}" data-category="{{ item.get_category_display }}">
+                                        {{ item.name }} ({{ item.part_number }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         <div class="form-hint">Select the inventory item to move</div>
                     </div>
                     
@@ -561,6 +557,10 @@
                     </div>
                 </form>
             </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        
         </div>
     </div>
     
@@ -673,6 +673,51 @@
                 }
             }
         });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+            const htmlElement = document.documentElement;
+
+            // Check for saved theme preference or use preferred color scheme
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                htmlElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+
+            // Toggle theme
+            themeToggle.addEventListener('click', function() {
+                if (htmlElement.getAttribute('data-theme') === 'dark') {
+                    htmlElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                    themeIcon.style.transform = 'rotate(360deg)';
+                } else {
+                    htmlElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                    themeIcon.style.transform = 'rotate(360deg)';
+                }
+
+                setTimeout(() => {
+                    themeIcon.style.transform = 'rotate(0)';
+                }, 500);
+            });
+        });
+        function selectMovement(type) {
+        // Remove 'selected' class from both options
+        document.querySelectorAll('.movement-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+
+        // Add 'selected' class to the clicked option
+        const selectedOption = document.querySelector(`.movement-option.${type}`);
+        selectedOption.classList.add('selected');
+    }
+        
     </script>
 </body>
 </html>

@@ -9,13 +9,14 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import Paragraph, Spacer, Image
+from reportlab.platypus import Paragraph, Spacer, Image, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import ParagraphStyle
 from django.conf import settings
 import os
 from datetime import datetime
 from django.utils import timezone
 from django.db import transaction
+from django.core.paginator import Paginator
 
 def is_admin(user):
     return user.is_superuser
@@ -101,8 +102,15 @@ def stock_movement(request):
 
 @login_required
 def stock_list(request):
-    stock_movements = StockMovement.objects.all().order_by('-date') 
-    return render(request, 'stock_list.html', {'stock_movements': stock_movements})
+    # Fetch all stock movements ordered by date
+    stock_movements = StockMovement.objects.all().order_by('-date')
+    
+    # Paginate the stock movements (8 per page)
+    paginator = Paginator(stock_movements, 8)
+    page_number = request.GET.get('page')  # Get the current page number from the request
+    page_obj = paginator.get_page(page_number)  # Get the page object
+    
+    return render(request, 'stock_list.html', {'page_obj': page_obj})
 
 @login_required
 @user_passes_test(is_admin)
@@ -189,98 +197,255 @@ def generate_pdf(request):
     items = InventoryItem.objects.all()
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="inventory_report.pdf"'
-
-    doc = SimpleDocTemplate(response, pagesize=letter,
-                            rightMargin=36, leftMargin=36,
-                            topMargin=72, bottomMargin=36)
+    
+    # Set up the document with better margins
+    doc = SimpleDocTemplate(
+        response, 
+        pagesize=letter,
+        rightMargin=50, 
+        leftMargin=50,
+        topMargin=50, 
+        bottomMargin=50
+    )
     
     elements = []
     
-    # Add logo and header
+    # Define colors for a professional look
+    brand_color = colors.HexColor('#7c3aed')  # Purple from your secondary color
+    accent_color = colors.HexColor('#3b82f6')  # Blue from your primary color
+    text_color = colors.HexColor('#1e293b')   # Dark slate
+    muted_color = colors.HexColor('#64748b')  # Gray
+    light_color = colors.HexColor('#f8fafc')  # Very light gray
+    border_color = colors.HexColor('#e2e8f0') # Light gray for borders
+    
+    # Create a title with company branding
+    styles = getSampleStyleSheet()
+    
+    # Company name and logo section
+    company_style = ParagraphStyle(
+        'Company',
+        parent=styles['Heading1'],
+        fontSize=22,
+        textColor=brand_color,
+        leading=26,
+        spaceAfter=0,
+    )
+    
+    # Add a table for the header (logo + title)
+    header_data = [[
+        Paragraph('<b>StockForge</b>', company_style),
+        Paragraph(f'<font color="#64748b" size="9">Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}</font>', 
+                 styles['Normal'])
+    ]]
+    
+    header_table = Table(header_data, colWidths=[doc.width/2.0]*2)
+    header_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(header_table)
+    
+    # Add an optional logo here
     # logo_path = os.path.join(settings.STATIC_ROOT, 'img/logo.png')
     # if os.path.exists(logo_path):
     #     logo = Image(logo_path, width=1.5*inch, height=0.5*inch)
     #     elements.append(logo)
     
-    # Header text
-    styles = getSampleStyleSheet()
-    header_style = ParagraphStyle(
-        'Header',
+    # Add horizontal line after header
+    elements.append(Spacer(1, 20))
+    elements.append(HRFlowable(
+        width="100%",
+        thickness=1,
+        color=border_color,
+        spaceAfter=0,
+        spaceBefore=0,
+        hAlign='CENTER',
+    ))
+    elements.append(Spacer(1, 20))
+    
+    # Report Title
+    title_style = ParagraphStyle(
+        'Title',
         parent=styles['Heading1'],
         fontSize=18,
-        textColor=colors.HexColor('#1e293b'),
-        spaceAfter=12,
+        textColor=text_color,
+        alignment=1,  # Center alignment
+        spaceAfter=10,
     )
+    elements.append(Paragraph("Inventory Report", title_style))
     
-    elements.append(Paragraph("Inventory Report", header_style))
+    # Add report summary section
+    components_count = InventoryItem.objects.filter(category='components').count()
+    equipment_count = InventoryItem.objects.filter(category='built_equipment').count()
     
-    # Report metadata
-    meta_style = ParagraphStyle(
-        'Meta',
-        parent=styles['BodyText'],
-        textColor=colors.HexColor('#64748b'),
-        fontSize=10,
-        spaceAfter=24,
+    summary_data = [
+        ['Total Inventory Items:', f"{items.count()} items"],
+        ['Components:', f"{components_count} items"],
+        ['Built Equipment:', f"{equipment_count} items"],
+        ['Generated On:', datetime.now().strftime('%Y-%m-%d %H:%M')],
+        ['Generated By:', request.user.get_full_name() or request.user.username],
+    ]
+    
+    summary_table = Table(summary_data, colWidths=[150, 200])
+    summary_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('TEXTCOLOR', (0, 0), (0, -1), brand_color),
+        ('TEXTCOLOR', (1, 0), (1, -1), text_color),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    
+    # Wrap the summary table in a container with background
+    summary_background = Table([[summary_table]], colWidths=[doc.width])
+    summary_background.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), light_color),
+        ('ROUNDEDCORNERS', [6, 6, 6, 6]),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 15),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 15),
+        ('TOPPADDING', (0, 0), (-1, -1), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+    ]))
+    
+    elements.append(Spacer(1, 15))
+    elements.append(summary_background)
+    elements.append(Spacer(1, 20))
+    
+    # Table header
+    section_style = ParagraphStyle(
+        'SectionHeader',
+        parent=styles['Heading2'],
+        fontSize=12,
+        textColor=text_color,
+        spaceAfter=8,
+        spaceBefore=15,
     )
-    elements.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", meta_style))
+    elements.append(Paragraph("Inventory Items", section_style))
+    elements.append(Spacer(1, 5))
     
-    # Create table data
+    # Create table data with more detailed information
     data = [
-        ['Part Number', 'Item Name', 'Category', 'Stock Level']
+        ['Part Number', 'Item Name', 'Category', 'Stock Level', 'Status']
     ]
     
     for item in items:
+        # Determine stock status
+        if item.total_stock <= 0:
+            stock_status = "Out of Stock"
+            status_color = colors.HexColor('#ef4444')  # Red
+        elif item.total_stock < 5:
+            stock_status = "Low Stock"
+            status_color = colors.HexColor('#f59e0b')  # Orange
+        elif item.total_stock < 20:
+            stock_status = "Medium Stock"
+            status_color = colors.HexColor('#10b981')  # Green
+        else:
+            stock_status = "Well Stocked"
+            status_color = colors.HexColor('#10b981')  # Green
+        
         data.append([
             item.part_number,
             item.name,
             item.get_category_display(),
-            str(item.total_stock)
+            str(item.total_stock),
+            stock_status
         ])
     
+    # Calculate column widths - allocate proportionally
+    col_widths = [80, 150, 100, 70, 80]
+    
     # Create table with professional styling
-    table = Table(data, repeatRows=1)
-    table.setStyle(TableStyle([
+    table = Table(data, repeatRows=1, colWidths=col_widths)
+    
+    # Complex table styling for a professional look
+    table_style = TableStyle([
         # Header
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#3b82f6')),
+        ('BACKGROUND', (0,0), (-1,0), brand_color),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,0), 11),
+        ('FONTSIZE', (0,0), (-1,0), 10),
+        ('ALIGN', (0,0), (-1,0), 'CENTER'),
         
         # Body
         ('FONTNAME', (0,1), (-1,-1), 'Helvetica'),
-        ('FONTSIZE', (0,1), (-1,-1), 10),
-        ('TEXTCOLOR', (0,1), (-1,-1), colors.HexColor('#1e293b')),
-        ('ALIGN', (0,0), (-1,-1), 'LEFT'),
-        ('ALIGN', (3,0), (3,-1), 'RIGHT'),
+        ('FONTSIZE', (0,1), (-1,-1), 9),
+        ('TEXTCOLOR', (0,1), (-1,-1), text_color),
+        
+        # Alignment
+        ('ALIGN', (0,0), (0,-1), 'LEFT'),  # Part number
+        ('ALIGN', (1,0), (1,-1), 'LEFT'),  # Name
+        ('ALIGN', (2,0), (2,-1), 'LEFT'),  # Category
+        ('ALIGN', (3,0), (3,-1), 'CENTER'),  # Stock level
+        ('ALIGN', (4,0), (4,-1), 'CENTER'),  # Status
         
         # Grid lines
         ('LINEBELOW', (0,0), (-1,0), 1, colors.white),
-        ('LINEBELOW', (0,1), (-1,-1), 0.5, colors.HexColor('#e2e8f0')),
+        ('LINEBELOW', (0,1), (-1,-1), 0.5, border_color),
+        ('LINEAFTER', (0,0), (-2,-1), 0.5, border_color),
         
         # Padding
-        ('PADDING', (0,0), (-1,-1), 8),
-        ('BOTTOMPADDING', (0,0), (-1,0), 12),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('LEFTPADDING', (0,0), (-1,-1), 6),
+        ('RIGHTPADDING', (0,0), (-1,-1), 6),
         
-        # Alternating row colors
-        ('BACKGROUND', (0,1), (-1,-1), colors.white),
-        ('BACKGROUND', (0,2), (-1,2), colors.HexColor('#f8fafc')),
-    ]))
+        # Alternate row background
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, light_color]),
+    ])
     
+    # Apply conditional formatting for stock status
+    for i in range(1, len(data)):
+        status = data[i][4]
+        if status == "Out of Stock":
+            table_style.add('TEXTCOLOR', (4, i), (4, i), colors.HexColor('#ef4444'))
+            table_style.add('BACKGROUND', (4, i), (4, i), colors.HexColor('#fee2e2'))
+        elif status == "Low Stock":
+            table_style.add('TEXTCOLOR', (4, i), (4, i), colors.HexColor('#f59e0b'))
+            table_style.add('BACKGROUND', (4, i), (4, i), colors.HexColor('#fef3c7'))
+        else:
+            table_style.add('TEXTCOLOR', (4, i), (4, i), colors.HexColor('#10b981'))
+            table_style.add('BACKGROUND', (4, i), (4, i), colors.HexColor('#d1fae5'))
+    
+    table.setStyle(table_style)
     elements.append(table)
     
-    # Add footer
-    footer_style = ParagraphStyle(
-        'Footer',
-        parent=styles['BodyText'],
-        textColor=colors.HexColor('#64748b'),
-        fontSize=8,
-        alignment=1,
+    # Add note section
+    elements.append(Spacer(1, 30))
+    note_style = ParagraphStyle(
+        'Note',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=muted_color,
+        alignment=0,
+        leftIndent=0,
     )
+    elements.append(Paragraph("<b>Notes:</b> This is an automatically generated inventory report. Low stock items may require restocking.", note_style))
     
-    elements.append(Spacer(1, 12))
-    elements.append(Paragraph(f"Generated by Inventory Management System | Page 1 of 1", footer_style))
+    # Add footer with page numbers
+    def add_page_number(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 8)
+        canvas.setFillColor(muted_color)
+        
+        # Add footer line
+        canvas.line(50, 40, letter[0] - 50, 40)
+        canvas.setLineWidth(0.5)
+        canvas.setStrokeColor(border_color)
+        
+        # Add company info and page numbers
+        footer_text = "StockForge Inventory Management System"
+        page_text = f"Page {canvas.getPageNumber()}"
+        
+        canvas.drawString(50, 25, footer_text)
+        canvas.drawRightString(letter[0] - 50, 25, page_text)
+        canvas.restoreState()
     
-    doc.build(elements)
+    # Build the document with page numbers
+    doc.build(elements, onFirstPage=add_page_number, onLaterPages=add_page_number)
     return response
 
 @login_required
