@@ -1,6 +1,6 @@
 # StockForge Inventory Platform
 
-![StockForge Dashboard](screenshots/dashboard.png)
+![StockForge Dashboard](screenshots\dashboard.png)
 
 **Enterprise Inventory Management Reimagined**  
 Modern orchestration for manufacturing workflows and multi-component inventory control.

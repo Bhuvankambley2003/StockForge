@@ -112,6 +112,8 @@ def stock_list(request):
     
     return render(request, 'stock_list.html', {'page_obj': page_obj})
 
+
+
 @login_required
 @user_passes_test(is_admin)
 def sensor_build(request):
