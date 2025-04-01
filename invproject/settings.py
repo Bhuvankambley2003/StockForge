@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'invproject.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "inventory",
-        "USER": "bhuvan",
-        "PASSWORD": "Bk2003",
-        "HOST": "127.0.0.1",
+        "NAME": "postgres",
+        "USER": "postgres.tsomfkugiabiemkyiwck",
+        "PASSWORD": "Vegam@bk2003",
+        "HOST": "aws-0-ap-southeast-1.pooler.supabase.com",
         "PORT": "5432",
     }
 }
