@@ -765,10 +765,10 @@
                 <!-- <li><a href="{% url 'inventory_list' %}"><i class="fas fa-boxes"></i> Inventory</a></li> -->
                 <li><a href="{% url 'stock_list' %}"><i class="fas fa-exchange-alt"></i> Stock Movements</a></li>
                 <li><a href="{% url 'deployed_sensors' %}"><i class="fas fa-satellite-dish"></i> Deployments</a></li>
-                {% if user.is_superuser %}
+
                 <li><a href="{% url 'sensor_build' %}"><i class="fas fa-cogs"></i> Production</a></li>
                 <!-- <li><a href="#"><i class="fas fa-users"></i> User Management</a></li> -->
-                {% endif %}
+
                 <li><a href="{% url 'generate_pdf' %}"><i class="fas fa-file-export"></i> Export Data</a></li>
             </ul>
             
@@ -901,14 +901,14 @@
             
             <!-- Action buttons -->
             <div class="action-bar">
-                {% if user.is_superuser %}
+
                 <a href="{% url 'add_inventory_item' %}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Add New Item
                 </a>
                 <a href="{% url 'sensor_build' %}" class="btn btn-secondary">
                     <i class="fas fa-cogs"></i> Build Equipment
                 </a>
-                {% endif %}
+
                 <a href="{% url 'stock_list' %}" class="btn btn-outline">
                     <i class="fas fa-exchange-alt"></i> Stock Movements
                 </a>

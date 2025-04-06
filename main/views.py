@@ -76,7 +76,7 @@ def inventory_list(request):
     })
 
 @login_required
-@user_passes_test(is_admin)
+# @user_passes_test(is_admin)
 def stock_movement(request):
     items = InventoryItem.objects.all()
     if request.method == 'POST':
@@ -115,7 +115,7 @@ def stock_list(request):
 
 
 @login_required
-@user_passes_test(is_admin)
+# @user_passes_test(is_admin)
 def sensor_build(request):
     raw_materials = InventoryItem.objects.filter(category='components')
     if request.method == 'POST':
