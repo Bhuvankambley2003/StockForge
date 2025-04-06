@@ -451,7 +451,6 @@ def generate_pdf(request):
     return response
 
 @login_required
-@user_passes_test(is_admin)
 def deployed_sensors(request):
     if request.method == 'POST':
         sensor_id = request.POST['sensor']
@@ -463,20 +462,27 @@ def deployed_sensors(request):
         sensor = get_object_or_404(InventoryItem, id=sensor_id, category='built_equipment')
         
         if sensor.total_stock < quantity:
+            # Get the appropriate deployments based on user role
+            if request.user.is_superuser:
+                deployments = DeployedSensor.objects.all()
+            else:
+                deployments = DeployedSensor.objects.filter(deployed_by=request.user)
+                
             return render(request, 'deployed_sensors.html', {
                 'error': f'Insufficient stock for {sensor.name}! Need {quantity}, have {sensor.total_stock}',
                 'sensors': InventoryItem.objects.filter(category='built_equipment'),
-                'deployments': DeployedSensor.objects.all()
+                'deployments': deployments
             })
         
-        # Create single deployment record with quantity
+        # Create single deployment record with quantity and associate with current user
         deployment = DeployedSensor.objects.create(
             sensor=sensor,
             company=company,
             deployment_date=deployment_date,
             expected_return_date=expected_return_date,
             status='DEPLOYED',
-            quantity=quantity
+            quantity=quantity,
+            deployed_by=request.user  # Associate with current user
         )
         
         # Update stock and create movement
@@ -493,9 +499,15 @@ def deployed_sensors(request):
         
         return redirect('deployed_sensors')
     
+    # Filter deployments based on user role
+    if request.user.is_superuser:
+        deployments = DeployedSensor.objects.all()
+    else:
+        deployments = DeployedSensor.objects.filter(deployed_by=request.user)
+    
     return render(request, 'deployed_sensors.html', {
         'sensors': InventoryItem.objects.filter(category='built_equipment'),
-        'deployments': DeployedSensor.objects.all()
+        'deployments': deployments
     })
 
 @login_required

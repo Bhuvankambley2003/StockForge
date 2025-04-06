@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings  # Add this import
 
 class InventoryItem(models.Model):
     CATEGORY_CHOICES = [
@@ -73,6 +74,13 @@ class DeployedSensor(models.Model):
     actual_return_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='DEPLOYED')
     quantity = models.PositiveIntegerField(default=1)
+    deployed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='sensor_deployments',
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return f"{self.sensor.name} deployed at {self.company}"
