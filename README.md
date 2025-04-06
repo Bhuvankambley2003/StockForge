@@ -20,13 +20,13 @@ Modern orchestration for manufacturing workflows and multi-component inventory c
 
 ## Technology Stack
 
-| Component               | Technology           |
-|-------------------------|----------------------|
-| Backend Framework       | Django 4.2           |
-| Database                | PostgreSQL           |
-| UI Toolkit              | SaaS Dashboard       |
-| Reporting               | ReportLab + Pandas   |
-| Deployment              | Docker + Nginx       |
+| Component               | Technology             |
+|-------------------------|------------------------|
+| Backend Framework       | Django 4.2             |
+| Database                | PostgreSQL by Supabase |
+| UI Toolkit              | SaaS Dashboard         |
+| Reporting               | ReportLab + Pandas     |
+| Deployment              | Docker + Nginx         |
 
 ## Quick Start with Docker
 
