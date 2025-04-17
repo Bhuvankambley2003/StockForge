@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
@@ -588,6 +589,9 @@
                 }, 500);
             });
         });
+
     </script>
+        <!-- Include auto-logout script -->
+    <script src="{% static 'js/auto-logout.js' %}"></script>
 </body>
 </html>

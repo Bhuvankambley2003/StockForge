@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -301,7 +302,7 @@
         .summary-card .value {
             font-size: 32px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var (--text-primary);
             margin-bottom: 8px;
         }
         
@@ -433,7 +434,7 @@
         /* Item ID column */
         .item-id {
             font-weight: 500;
-            color: var(--text-muted);
+            color: var (--text-muted);
         }
         
         /* Item name with indicator */
@@ -497,15 +498,15 @@
         }
         
         .stock-critical {
-            color: var(--danger);
+            color: var (--danger);
         }
         
         .stock-warning {
-            color: var(--warning);
+            color: var (--warning);
         }
         
         .stock-good {
-            color: var(--success);
+            color: var (--success);
         }
         
         /* Action buttons */
@@ -749,16 +750,79 @@
                 height: 45px;
             }
         }
+
+        .stock-critical {
+            color: var(--danger); /* Red */
+        }
+
+        .stock-warning {
+            color: var(--warning); /* Orange */
+        }
+
+        .stock-good {
+            color: var(--success); /* Green */
+        }
+
+        /* Threshold form styling */
+        .threshold-form-container {
+            background-color: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .threshold-form-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .threshold-form-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .threshold-input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .threshold-color-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-full);
+        }
+
+        .threshold-color-indicator.low {
+            background-color: var(--danger);
+        }
+
+        .threshold-color-indicator.medium {
+            background-color: var(--warning);
+        }
+
+        .threshold-color-indicator.high {
+            background-color: var(--success);
+        }
     </style>
 </head>
 <body>
     <div class="main-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="app-logo">
+            <a href="{% url 'inventory_list' %}" class="app-logo">
                 <i class="fas fa-boxes" style="font-size: 24px; color: var(--primary);"></i>
                 <h1>StockForge</h1>
-            </div>
+            </a>
             
             <ul class="sidebar-menu">
                 <li><a href="{% url 'inventory_list' %}" class="active"><i class="fas fa-th-large"></i> Dashboard</a></li>
@@ -847,7 +911,9 @@
                             <th width="15%">Part Number</th>
                             <th width="25%">Item Name</th>
                             <th width="15%">Category</th>
-                            <th width="15%">Stock Level</th>
+                            <th width="15%" style="text-align: left; cursor: pointer;" id="stockLevelHeading">
+                                Stock Level
+                            </th>
                             <th width="15%" style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
@@ -898,23 +964,49 @@
                     </tbody>
                 </table>
             </div>
-            
+            <!-- Add this form below the table -->
+            <div id="thresholdForm" style="display: none; margin-top: 20px;">
+                <div class="threshold-form-container">
+                    <h3 class="threshold-form-title">Set Stock Level Thresholds</h3>
+                    <div class="threshold-form-group">
+                        <label for="lowThreshold">Low Stock Threshold:</label>
+                        <input type="text" id="lowThreshold" value="5" min="0" class="threshold-input" inputmode="numeric" onkeypress="return isNumberKey(event)">
+                        <div class="threshold-color-indicator low"></div>
+                    </div>
+                    <div class="threshold-form-group">
+                        <label for="mediumThreshold">Medium Stock Threshold:</label>
+                        <input type="text" id="mediumThreshold" value="20" min="0" class="threshold-input" inputmode="numeric" onkeypress="return isNumberKey(event)">
+                        <div class="threshold-color-indicator medium"></div>
+                    </div>
+                    <div class="threshold-form-group">
+                        <label for="highThreshold">High Stock Threshold:</label>
+                        <input type="text" id="highThreshold" value="50" min="0" class="threshold-input" inputmode="numeric" onkeypress="return isNumberKey(event)">
+                        <div class="threshold-color-indicator high"></div>
+                    </div>
+                    <button id="applyThresholds" class="btn btn-primary">Apply</button>
+                    <button id="cancelThresholds" class="btn btn-outline">Cancel</button>
+                </div>
+            </div>
             <!-- Action buttons -->
             <div class="action-bar">
-
                 <a href="{% url 'add_inventory_item' %}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Add New Item
                 </a>
                 <a href="{% url 'sensor_build' %}" class="btn btn-secondary">
                     <i class="fas fa-cogs"></i> Build Equipment
                 </a>
-
                 <a href="{% url 'stock_list' %}" class="btn btn-outline">
                     <i class="fas fa-exchange-alt"></i> Stock Movements
                 </a>
                 <a href="{% url 'generate_pdf' %}" class="btn btn-outline">
-                    <i class="fas fa-file-pdf"></i> Export Report
+                    <i class="fas fa-file-pdf"></i> Export Report PDF
                 </a>
+                <a href="{% url 'export_to_excel' %}" class="btn btn-outline">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </a>
+                <button id="customizeThresholds" class="btn btn-outline">
+                    <i class="fas fa-sliders-h"></i> Customize Stock Thresholds
+                </button>
             </div>
         </main>
     </div>
@@ -938,8 +1030,72 @@
         }
     </script>
     <script>
-        // Theme Toggle Functionality
+        // Theme Toggle and Stock Level Threshold Functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Stock Level Threshold Logic
+            const customizeThresholdsBtn = document.getElementById('customizeThresholds');
+            const thresholdForm = document.getElementById('thresholdForm');
+            const applyThresholdsButton = document.getElementById('applyThresholds');
+            const lowThresholdInput = document.getElementById('lowThreshold');
+            const mediumThresholdInput = document.getElementById('mediumThreshold');
+            const highThresholdInput = document.getElementById('highThreshold');
+            const stockLevels = document.querySelectorAll('.stock-level');
+
+            // Show the threshold form when the "Customize Stock Thresholds" button is clicked
+            if (customizeThresholdsBtn) {
+                customizeThresholdsBtn.addEventListener('click', function() {
+                    console.log('Customize Thresholds button clicked!');
+                    thresholdForm.style.display = thresholdForm.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+
+            // Cancel button functionality
+            const cancelThresholdsButton = document.getElementById('cancelThresholds');
+            if (cancelThresholdsButton) {
+                cancelThresholdsButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    thresholdForm.style.display = 'none';
+                });
+            }
+
+            // Function to update stock level colors
+            function updateStockColors() {
+                const lowThreshold = parseInt(lowThresholdInput.value, 10);
+                const mediumThreshold = parseInt(mediumThresholdInput.value, 10);
+                const highThreshold = parseInt(highThresholdInput.value, 10);
+
+                stockLevels.forEach(level => {
+                    const stock = parseInt(level.textContent.trim(), 10);
+                    if (isNaN(stock)) return; // Skip if stock is not a valid number
+
+                    level.classList.remove('stock-critical', 'stock-warning', 'stock-good');
+
+                    if (stock < lowThreshold) {
+                        level.classList.add('stock-critical'); // Red color
+                    } else if (stock < mediumThreshold) {
+                        level.classList.add('stock-warning'); // Orange color
+                    } else if (stock < highThreshold) {
+                        level.classList.add('stock-good'); // Green color
+                    } else {
+                        level.classList.add('stock-good'); // Green color for high stock
+                    }
+                });
+            }
+
+            // Apply new thresholds when the "Apply" button is clicked
+            if (applyThresholdsButton) {
+                applyThresholdsButton.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent form submission
+                    updateStockColors();
+                    alert('Stock level thresholds updated!');
+                    thresholdForm.style.display = 'none'; // Hide the form after applying
+                });
+            }
+
+            // Initial stock color update
+            updateStockColors();
+            
+            // Theme Toggle Functionality
             const themeToggle = document.getElementById('themeToggle');
             const themeIcon = themeToggle.querySelector('i');
             const htmlElement = document.documentElement;
@@ -986,9 +1142,16 @@
                     }
                 });
             }
-            
-            // Your existing filterItems function is kept intact
         });
+
+        // Function to allow only numeric input
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
+        }
     </script>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
         <i class="fas fa-moon"></i>
@@ -996,5 +1159,8 @@
     <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">
         <i class="fas fa-bars"></i>
     </button>
+
+    <!-- Include auto-logout script -->
+    <script src="{% static 'js/auto-logout.js' %}"></script>
 </body>
 </html>

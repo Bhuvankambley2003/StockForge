@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-o@q=flrt=q47-0k1qjp9u)^s5=5%!sdxttmg5ch$0wx*9pt)jb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['stockforge.onrender.com','127.0.0.1:8000','127.0.0.1','0.0.0.0:8000']
 
 
 # Application definition
@@ -48,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  
 ]
 
 ROOT_URLCONF = 'invproject.urls'
@@ -70,22 +71,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'invproject.wsgi.application'
 
+# Database
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres.tsomfkugiabiemkyiwck",
-        "PASSWORD": "Vegam@bk2003",
-        "HOST": "aws-0-ap-southeast-1.pooler.supabase.com",
-        "PORT": "5432",
+        "NAME": os.getenv('SUPABASE_DB_NAME'),
+        "USER": os.getenv('SUPABASE_DB_USER'),
+        "PASSWORD": os.getenv('SUPABASE_DB_PASSWORD'),
+        "HOST": os.getenv('SUPABASE_DB_HOST'),
+        "PORT": os.getenv('SUPABASE_DB_PORT'),
     }
 }
 
-
+# print("Database Host:", os.getenv('SUPABASE_DB_HOST'))
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -121,8 +125,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Session settings
+SESSION_COOKIE_AGE = 120  # 2 minutes in seconds (for testing)
+SESSION_SAVE_EVERY_REQUEST = True  # Update the session expiry on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Session expires when browser is closed
+
+# Authentication settings
+LOGIN_URL = '/'  # Set the login URL to the root URL where your login view is
+LOGIN_REDIRECT_URL = '/inventory-list/'  # Redirect here after successful login

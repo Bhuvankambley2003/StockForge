@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 def login_view(request):
     if request.method == 'POST':
@@ -36,3 +38,13 @@ def user_management(request):
         return redirect('inventory_list')
     users = User.objects.all()
     return render(request, 'user_management.html', {'users': users})
+
+@login_required
+@require_POST
+def refresh_session(request):
+    """
+    Simple view to refresh the user's session
+    """
+    # Just by accessing the view, the session expiry is reset
+    # due to SESSION_SAVE_EVERY_REQUEST = True
+    return JsonResponse({"status": "success", "message": "Session refreshed"})

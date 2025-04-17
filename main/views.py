@@ -18,6 +18,10 @@ from django.utils import timezone
 from django.db import transaction
 from django.core.paginator import Paginator
 
+from openpyxl.styles import Font, Alignment
+from django.http import HttpResponse
+import openpyxl
+
 def is_admin(user):
     return user.is_superuser
 
@@ -535,7 +539,8 @@ def update_deployment_status(request, pk):
                         purpose='Return',
                         remarks=f'Returned {deployment.quantity} from {deployment.company}'
                     )
-                    
+
+                
             elif new_status in ['DEPLOYED', 'SOLD']:
                 if previous_status == 'RETURNED':
                     if sensor.total_stock >= deployment.quantity:
@@ -560,3 +565,63 @@ def update_deployment_status(request, pk):
 
 
 
+# excel report generation method
+
+@login_required
+def export_to_excel(request):
+    # Create a new Excel workbook and sheet
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = "Inventory Report"
+
+    # Add header row
+    headers = ["Part Number", "Item Name", "Category", "Stock Level", "Status"]
+    header_font = Font(bold=True)
+    for col_num, header in enumerate(headers, 1):
+        cell = sheet.cell(row=1, column=col_num)
+        cell.value = header
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center")
+
+    # Fetch inventory data
+    items = InventoryItem.objects.all()
+
+    # Add data rows
+    for row_num, item in enumerate(items, 2):
+        # Determine stock status
+        if item.total_stock <= 0:
+            stock_status = "Out of Stock"
+        elif item.total_stock < 5:
+            stock_status = "Low Stock"
+        elif item.total_stock < 20:
+            stock_status = "Medium Stock"
+        else:
+            stock_status = "Well Stocked"
+
+        # Add data to the row
+        sheet.cell(row=row_num, column=1).value = item.part_number
+        sheet.cell(row=row_num, column=2).value = item.name
+        sheet.cell(row=row_num, column=3).value = item.get_category_display()
+        sheet.cell(row=row_num, column=4).value = item.total_stock
+        sheet.cell(row=row_num, column=5).value = stock_status
+
+    # Adjust column widths
+    for column in sheet.columns:
+        max_length = 0
+        column_letter = column[0].column_letter  # Get the column letter
+        for cell in column:
+            try:
+                if cell.value:
+                    max_length = max(max_length, len(str(cell.value)))
+            except:
+                pass
+        adjusted_width = max_length + 2
+        sheet.column_dimensions[column_letter].width = adjusted_width
+
+    # Create HTTP response with Excel file
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="inventory_report.xlsx"'
+    workbook.save(response)
+    return response
