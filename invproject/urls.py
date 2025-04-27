@@ -14,7 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from main.views import add_inventory_item, inventory_list, stock_movement, stock_list, sensor_build, sensor_detail,generate_pdf, deployed_sensors, update_deployment_status,export_to_excel
+from main.views import add_inventory_item, inventory_list, stock_movement, stock_list, sensor_build, sensor_detail,generate_pdf, deployed_sensors, update_deployment_status,export_to_excel,save_item_threshold
 from main.views_auth import login_view, logout_view, register_view, user_management, refresh_session
 from django.contrib import admin
 from django.urls import path
@@ -36,4 +36,5 @@ urlpatterns = [
     path('update-deployment/<int:pk>/', update_deployment_status, name='update_deployment_status'),
     path('export-to-excel/', export_to_excel, name='export_to_excel'),
     path('refresh-session/', refresh_session, name='refresh_session'),
+    path('save-threshold/', save_item_threshold, name='save_item_threshold'),
 ]

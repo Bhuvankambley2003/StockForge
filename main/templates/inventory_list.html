@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load threshold_filters %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -813,6 +814,244 @@
         .threshold-color-indicator.high {
             background-color: var(--success);
         }
+        /* Dropdown styling */
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-icon {
+            font-size: 10px;
+            transition: transform 0.2s;
+            margin-left: 4px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 180px;
+            background-color: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+            z-index: 20;
+        }
+
+        /* Show dropdown on hover */
+        .dropdown-container:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-container:hover .dropdown-icon {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:first-child {
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 var(--radius) var(--radius);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Add a subtle separator between dropdown items */
+        .dropdown-item:not(:last-child) {
+            border-bottom: 1px solid var(--border-lighter);
+        }
+
+            /* Modal styling */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background-color: var(--bg-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        width: 90%;
+        max-width: 500px;
+        overflow: hidden;
+        animation: modalFadeIn 0.3s;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        color: var(--text-primary);
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: var(--text-muted);
+        cursor: pointer;
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .modal-footer {
+        padding: 16px 0 0 0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .threshold-note {
+        margin-top: 16px;
+        padding: 12px;
+        background-color: var(--hover-bg);
+        border-radius: var(--radius);
+        color: var(--text-muted);
+        font-size: 13px;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .threshold-note i {
+        color: var(--primary);
+        margin-top: 2px;
+    }
+
+    /* Stock level container with edit button */
+    .stock-level-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .threshold-edit {
+        opacity: 0.4;
+        transition: opacity 0.2s;
+    }
+
+    .stock-level-container:hover .threshold-edit {
+        opacity: 1;
+    }
+
+    /* Messages styling */
+    .messages {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1010;
+        max-width: 400px;
+    }
+
+    .message {
+        display: flex;
+        margin-bottom: 10px;
+        padding: 16px;
+        border-radius: var(--radius);
+        background-color: var(--bg-card);
+        box-shadow: var(--shadow-lg);
+        animation: messageSlideIn 0.3s;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .message-success {
+        border-left: 4px solid var(--success);
+    }
+
+    .message-error {
+        border-left: 4px solid var(--danger);
+    }
+
+    .message-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .message i {
+        font-size: 18px;
+    }
+
+    .message-success i {
+        color: var(--success);
+    }
+
+    .message-error i {
+        color: var(--danger);
+    }
+
+    .close-message {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    @keyframes messageSlideIn {
+        from { opacity: 0; transform: translateX(50px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
     </style>
 </head>
 <body>
@@ -829,11 +1068,23 @@
                 <!-- <li><a href="{% url 'inventory_list' %}"><i class="fas fa-boxes"></i> Inventory</a></li> -->
                 <li><a href="{% url 'stock_list' %}"><i class="fas fa-exchange-alt"></i> Stock Movements</a></li>
                 <li><a href="{% url 'deployed_sensors' %}"><i class="fas fa-satellite-dish"></i> Deployments</a></li>
-
                 <li><a href="{% url 'sensor_build' %}"><i class="fas fa-cogs"></i> Production</a></li>
                 <!-- <li><a href="#"><i class="fas fa-users"></i> User Management</a></li> -->
 
-                <li><a href="{% url 'generate_pdf' %}"><i class="fas fa-file-export"></i> Export Data</a></li>
+                <li class="dropdown-container">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="fas fa-file-export"></i> Export Data
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'generate_pdf' %}" class="dropdown-item">
+                            <i class="fas fa-file-pdf"></i> Export as PDF
+                        </a>
+                        <a href="{% url 'export_to_excel' %}" class="dropdown-item">
+                            <i class="fas fa-file-excel"></i> Export as Excel
+                        </a>
+                    </div>
+                </li>
             </ul>
             
             <div class="user-section">
@@ -855,6 +1106,27 @@
         
         <!-- Main content -->
         <main class="content">
+            <!-- Add messages display for notifications -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {% if message.tags %}message-{{ message.tags }}{% endif %}">
+                    <div class="message-content">
+                        {% if message.tags == 'success' %}
+                        <i class="fas fa-check-circle"></i>
+                        {% elif message.tags == 'error' %}
+                        <i class="fas fa-exclamation-circle"></i>
+                        {% else %}
+                        <i class="fas fa-info-circle"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                    <button class="close-message">&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Inventory Dashboard</h1>
                 <p class="dashboard-subtitle">Manage and track your inventory items</p>
@@ -939,9 +1211,20 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="stock-level {% if item.total_stock < 5 %}stock-critical{% elif item.total_stock < 20 %}stock-warning{% else %}stock-good{% endif %}">
-                                    {{ item.total_stock }}
-                                    <span class="stock-unit">units</span>
+                                <div class="stock-level-container">
+                                    {% with threshold=user_thresholds|get_item_threshold:item.id %}
+                                    {% with low=threshold|get_low_threshold medium=threshold|get_medium_threshold %}
+                                    <div class="stock-level {% if item.total_stock < low %}stock-critical{% elif item.total_stock < medium %}stock-warning{% else %}stock-good{% endif %}">
+                                        {{ item.total_stock }}
+                                        <span class="stock-unit">units</span>
+                                        <!-- Debug info - remove after testing -->
+                                        <span style="font-size: 10px; display: block;">(L:{{ low }}, M:{{ medium }})</span>
+                                    </div>
+                                    {% endwith %}
+                                    {% endwith %}
+                                    <button type="button" class="btn-icon threshold-edit" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}">
+                                        <i class="fas fa-sliders-h"></i>
+                                    </button>
                                 </div>
                             </td>
                             <td>
@@ -998,15 +1281,23 @@
                 <a href="{% url 'stock_list' %}" class="btn btn-outline">
                     <i class="fas fa-exchange-alt"></i> Stock Movements
                 </a>
-                <a href="{% url 'generate_pdf' %}" class="btn btn-outline">
-                    <i class="fas fa-file-pdf"></i> Export Report PDF
-                </a>
-                <a href="{% url 'export_to_excel' %}" class="btn btn-outline">
-                    <i class="fas fa-file-excel"></i> Export to Excel
-                </a>
-                <button id="customizeThresholds" class="btn btn-outline">
+                <!-- <div class="dropdown-container">
+                    <button class="btn btn-outline dropdown-toggle">
+                        <i class="fas fa-file-export"></i> Export Data
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'generate_pdf' %}" class="dropdown-item">
+                            <i class="fas fa-file-pdf"></i> Export as PDF
+                        </a>
+                        <a href="{% url 'export_to_excel' %}" class="dropdown-item">
+                            <i class="fas fa-file-excel"></i> Export as Excel
+                        </a>
+                    </div>
+                </div> -->
+                <!-- <button id="customizeThresholds" class="btn btn-outline">
                     <i class="fas fa-sliders-h"></i> Customize Stock Thresholds
-                </button>
+                </button> -->
             </div>
         </main>
     </div>
@@ -1058,26 +1349,47 @@
                 });
             }
 
-            // Function to update stock level colors
+            // Function to update stock level colors - Modified to respect per-item thresholds
             function updateStockColors() {
-                const lowThreshold = parseInt(lowThresholdInput.value, 10);
-                const mediumThreshold = parseInt(mediumThresholdInput.value, 10);
-                const highThreshold = parseInt(highThresholdInput.value, 10);
-
                 stockLevels.forEach(level => {
-                    const stock = parseInt(level.textContent.trim(), 10);
+                    // For each stock level, read its current thresholds from the debug span
+                    const debugSpan = level.querySelector('span[style*="font-size: 10px"]');
+                    
+                    if (!debugSpan) return; // Skip if no debug span found
+                    
+                    // Parse custom thresholds from debug span
+                    const thresholdText = debugSpan.textContent;
+                    const lowMatch = thresholdText.match(/L:(\d+)/);
+                    const mediumMatch = thresholdText.match(/M:(\d+)/);
+                    
+                    // Default thresholds
+                    let lowThreshold = 5;
+                    let mediumThreshold = 20;
+                    
+                    // Use custom thresholds if available
+                    if (lowMatch && lowMatch[1]) {
+                        lowThreshold = parseInt(lowMatch[1]);
+                    }
+                    
+                    if (mediumMatch && mediumMatch[1]) {
+                        mediumThreshold = parseInt(mediumMatch[1]);
+                    }
+                    
+                    // Get the stock value (parse the first part before the "units" text)
+                    const stockText = level.childNodes[0].textContent.trim();
+                    const stock = parseInt(stockText);
                     if (isNaN(stock)) return; // Skip if stock is not a valid number
-
+                    
+                    // Remove all stock classes
                     level.classList.remove('stock-critical', 'stock-warning', 'stock-good');
-
+                    
+                    // Apply appropriate class based on item-specific thresholds
                     if (stock < lowThreshold) {
                         level.classList.add('stock-critical'); // Red color
                     } else if (stock < mediumThreshold) {
-                        level.classList.add('stock-warning'); // Orange color
-                    } else if (stock < highThreshold) {
-                        level.classList.add('stock-good'); // Green color
+                        level.classList.add('stock-warning'); // Orange color 
                     } else {
-                        level.classList.add('stock-good'); // Green color for high stock
+                        level.classList.add('stock-good'); // Green color
                     }
                 });
             }
@@ -1086,13 +1398,39 @@
             if (applyThresholdsButton) {
                 applyThresholdsButton.addEventListener('click', function(e) {
                     e.preventDefault(); // Prevent form submission
-                    updateStockColors();
+                    
+                    // For global thresholds - not item-specific
+                    const lowThreshold = parseInt(lowThresholdInput.value, 10);
+                    const mediumThreshold = parseInt(mediumThresholdInput.value, 10);
+                    const highThreshold = parseInt(highThresholdInput.value, 10);
+                    
+                    // Apply these thresholds to all items without custom thresholds
+                    stockLevels.forEach(level => {
+                        const debugSpan = level.querySelector('span[style*="font-size: 10px"]');
+                        if (!debugSpan) {
+                            // No custom thresholds, use the global ones
+                            const stockText = level.childNodes[0].textContent.trim();
+                            const stock = parseInt(stockText);
+                            if (isNaN(stock)) return;
+                            
+                            level.classList.remove('stock-critical', 'stock-warning', 'stock-good');
+                            
+                            if (stock < lowThreshold) {
+                                level.classList.add('stock-critical');
+                            } else if (stock < mediumThreshold) {
+                                level.classList.add('stock-warning');
+                            } else {
+                                level.classList.add('stock-good');
+                            }
+                        }
+                    });
+                    
                     alert('Stock level thresholds updated!');
                     thresholdForm.style.display = 'none'; // Hide the form after applying
                 });
             }
 
-            // Initial stock color update
+            // Initial stock color update - run on page load
             updateStockColors();
             
             // Theme Toggle Functionality
@@ -1144,6 +1482,7 @@
             }
         });
 
+
         // Function to allow only numeric input
         function isNumberKey(evt) {
             var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -1152,6 +1491,138 @@
             }
             return true;
         }
+
+        // Item-specific threshold handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get modal elements
+            const modal = document.getElementById('itemThresholdModal');
+            const closeBtn = document.getElementById('closeItemThresholdModal');
+            const cancelBtn = document.getElementById('cancelItemThresholds');
+            const form = document.getElementById('itemThresholdForm');
+            const itemNameSpan = document.getElementById('itemThresholdName');
+            const itemIdInput = document.getElementById('itemIdInput');
+            const itemLowThreshold = document.getElementById('itemLowThreshold');
+            const itemMediumThreshold = document.getElementById('itemMediumThreshold');
+            
+            // Add click handlers to all threshold edit buttons
+            document.querySelectorAll('.threshold-edit').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const itemId = this.getAttribute('data-item-id');
+                    const itemName = this.getAttribute('data-item-name');
+                    
+                    // Get current thresholds from the debug span
+                    const row = this.closest('tr');
+                    const stockCell = row.querySelector('.stock-level');
+                    const debugSpan = stockCell.querySelector('span[style*="font-size: 10px"]');
+                    
+                    let lowValue = 5;  // Default
+                    let mediumValue = 20;  // Default
+                    
+                    // Parse values from debug span text if available (format: (L:X, M:Y))
+                    if (debugSpan) {
+                        const thresholdText = debugSpan.textContent;
+                        const lowMatch = thresholdText.match(/L:(\d+)/);
+                        const mediumMatch = thresholdText.match(/M:(\d+)/);
+                        
+                        if (lowMatch && lowMatch[1]) {
+                            lowValue = parseInt(lowMatch[1]);
+                        }
+                        
+                        if (mediumMatch && mediumMatch[1]) {
+                            mediumValue = parseInt(mediumMatch[1]);
+                        }
+                    }
+                    
+                    // Set form values
+                    itemNameSpan.textContent = itemName;
+                    itemIdInput.value = itemId;
+                    itemLowThreshold.value = lowValue;
+                    itemMediumThreshold.value = mediumValue;
+                    
+                    // Show modal
+                    modal.classList.add('active');
+                });
+            });
+            
+            // Close modal when clicking the X button
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            // Close modal when clicking the Cancel button
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    modal.classList.remove('active');
+                });
+            }
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+            
+            // Force page refresh after form submission to show updated thresholds
+            if (form) {
+                form.addEventListener('submit', function() {
+                    // Add a small delay before reloading to allow the form to submit
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 100);
+                });
+            }
+            
+            // Message handling
+            setTimeout(function() {
+                document.querySelectorAll('.message').forEach(msg => {
+                    msg.style.opacity = '0';
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 300);
+                });
+            }, 5000);
+            
+            // Allow manual dismissal of messages
+            document.querySelectorAll('.close-message').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const message = this.parentElement;
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                });
+            });
+        });
+            
+        // Message handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto dismiss messages after 5 seconds
+            setTimeout(function() {
+                document.querySelectorAll('.message').forEach(msg => {
+                    msg.style.opacity = '0';
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 300);
+                });
+            }, 5000);
+            
+            // Allow manual dismissal
+            document.querySelectorAll('.close-message').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const message = this.parentElement;
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                });
+            });
+        });
+
     </script>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
         <i class="fas fa-moon"></i>
@@ -1162,5 +1633,66 @@
 
     <!-- Include auto-logout script -->
     <script src="{% static 'js/auto-logout.js' %}"></script>
+
+    <!-- Item Threshold Modal -->
+    <div id="itemThresholdModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Custom Thresholds: <span id="itemThresholdName"></span></h2>
+                <button type="button" class="close-modal" id="closeItemThresholdModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="itemThresholdForm" method="post" action="{% url 'save_item_threshold' %}" onsubmit="setTimeout(function() { window.location.reload(); }, 500); return true;">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" id="itemIdInput">
+                    
+                    <div class="threshold-form-group">
+                        <label for="itemLowThreshold">Low Stock Threshold (Critical):</label>
+                        <input type="number" id="itemLowThreshold" name="low_threshold" value="5" min="1" class="threshold-input" required>
+                        <div class="threshold-color-indicator low"></div>
+                    </div>
+                    
+                    <div class="threshold-form-group">
+                        <label for="itemMediumThreshold">Medium Stock Threshold (Warning):</label>
+                        <input type="number" id="itemMediumThreshold" name="medium_threshold" value="20" min="1" class="threshold-input" required>
+                        <div class="threshold-color-indicator medium"></div>
+                    </div>
+                    
+                    <div class="threshold-note">
+                        <i class="fas fa-info-circle"></i>
+                        These thresholds are specific to your user account and this item only.
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Thresholds
+                        </button>
+                        <button type="button" class="btn btn-outline" id="cancelItemThresholds">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}message-{{ message.tags }}{% endif %}">
+            <div class="message-content">
+                {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle"></i>
+                {% elif message.tags == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+                {% else %}
+                <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </div>
+            <button class="close-message">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </body>
 </html>

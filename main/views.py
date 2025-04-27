@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import InventoryItem, StockMovement, SensorBuild, SensorComponent, DeployedSensor
+from .models import InventoryItem, StockMovement, SensorBuild, SensorComponent, DeployedSensor , UserItemThreshold
 from .forms import InventoryItemForm
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
@@ -17,6 +17,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.db import transaction
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 from openpyxl.styles import Font, Alignment
 from django.http import HttpResponse
@@ -73,11 +74,21 @@ def inventory_list(request):
     items = InventoryItem.objects.all()
     raw_materials_count = InventoryItem.objects.filter(category='components').count()
     sensors_count = InventoryItem.objects.filter(category='built_equipment').count()
+    
+    # Get all user's thresholds
+    user_thresholds = UserItemThreshold.objects.filter(user=request.user)
+    
+    # Create a dictionary for faster lookup
+    thresholds_dict = {t.item_id: {'low': t.low_threshold, 'medium': t.medium_threshold} for t in user_thresholds}
+    
     return render(request, 'inventory_list.html', {
         'items': items,
         'raw_materials_count': raw_materials_count,
-        'sensors_count': sensors_count
+        'sensors_count': sensors_count,
+        'user_thresholds': thresholds_dict
     })
+
+
 
 @login_required
 # @user_passes_test(is_admin)
@@ -625,3 +636,74 @@ def export_to_excel(request):
     response["Content-Disposition"] = 'attachment; filename="inventory_report.xlsx"'
     workbook.save(response)
     return response
+
+
+# Add these functions to views.py
+
+def get_item_thresholds(user, item):
+    """Get user-specific thresholds for an item or return defaults"""
+    try:
+        user_threshold = UserItemThreshold.objects.get(user=user, item=item)
+        return {
+            'low': user_threshold.low_threshold,
+            'medium': user_threshold.medium_threshold
+        }
+    except UserItemThreshold.DoesNotExist:
+        # Return default thresholds
+        return {
+            'low': 5,
+            'medium': 20
+        }
+
+def get_stock_status(user, item):
+    """Determine stock status based on user-specific thresholds"""
+    thresholds = get_item_thresholds(user, item)
+    
+    if item.total_stock < thresholds['low']:
+        return 'critical'
+    elif item.total_stock < thresholds['medium']:
+        return 'warning'
+    else:
+        return 'good'
+
+
+
+
+@login_required
+def save_item_threshold(request):
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        low_threshold = request.POST.get('low_threshold')
+        medium_threshold = request.POST.get('medium_threshold')
+        
+        # Basic validation
+        try:
+            item = get_object_or_404(InventoryItem, id=item_id)
+            low_threshold = int(low_threshold)
+            medium_threshold = int(medium_threshold)
+            
+            if low_threshold < 0 or medium_threshold < 0:
+                messages.error(request, "Thresholds must be positive")
+                return redirect('inventory_list')
+                
+            if low_threshold >= medium_threshold:
+                messages.error(request, "Low threshold must be less than medium threshold")
+                return redirect('inventory_list')
+                
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid threshold values")
+            return redirect('inventory_list')
+        
+        # Save or update the thresholds
+        UserItemThreshold.objects.update_or_create(
+            user=request.user,
+            item=item,
+            defaults={
+                'low_threshold': low_threshold,
+                'medium_threshold': medium_threshold
+            }
+        )
+        
+        messages.success(request, f"Custom thresholds for {item.name} saved successfully")
+    
+    return redirect('inventory_list')

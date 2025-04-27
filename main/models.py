@@ -84,3 +84,19 @@ class DeployedSensor(models.Model):
 
     def __str__(self):
         return f"{self.sensor.name} deployed at {self.company}"
+    
+
+
+class UserItemThreshold(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
+                           related_name='custom_thresholds')
+    item = models.ForeignKey(InventoryItem, on_delete=models.CASCADE,
+                           related_name='user_thresholds')
+    low_threshold = models.PositiveIntegerField(default=5)
+    medium_threshold = models.PositiveIntegerField(default=20)
+    
+    class Meta:
+        unique_together = ['user', 'item']
+    
+    def __str__(self):
+        return f"{self.user.username}'s thresholds for {self.item.name}"
