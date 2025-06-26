@@ -584,6 +584,26 @@
             font-size: 20px;
             transition: transform 0.5s ease;
         }
+
+
+            /* Make sure this styling is in the style section */
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            font-size: 15px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            background-color: var(--bg-card);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
         
         @media (max-width: 768px) {
             .theme-toggle {
@@ -599,9 +619,11 @@
     <div class="container">
         <header class="page-header">
             <div class="header-title">
-                <div class="header-icon">
-                    <i class="fas fa-cogs"></i>
-                </div>
+                <a href="{% url 'inventory_list' %}" >
+                    <div class="header-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                </a>
                 <div class="header-text">
                     <h1>Equipment Assembly</h1>
                     <p>Build and configure new equipment using available components</p>
@@ -656,7 +678,19 @@
                                 <input type="text" id="part_number" name="part_number" required placeholder="Format: SNS-XXXX">
                                 <div class="form-hint">Enter a unique identifier for this equipment</div>
                             </div>
-
+                            <div class="form-group">
+                                <label class="form-label" for="item_class">
+                                    <i class="fas fa-layer-group"></i>
+                                    Equipment Class
+                                </label>
+                                <select class="form-control" id="item_class" name="item_class" required>
+                                    <option value="mechanical">Mechanical</option>
+                                    <option value="electrical">Electrical</option>
+                                    <option value="board">Board</option>
+                                </select>
+                                <div class="form-hint">Specify the classification for this equipment</div>
+                            </div>
+                                                        
                             <div class="form-group">
                                 <label class="form-label" for="number_of_sensors">
                                     <i class="fas fa-cube"></i>

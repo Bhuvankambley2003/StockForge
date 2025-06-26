@@ -6,10 +6,17 @@ class InventoryItem(models.Model):
         ('components', 'Components'),
         ('built_equipment', 'Built Equipment'),
     ]
+    
+    CLASS_CHOICES = [
+        ('mechanical', 'Mechanical'),
+        ('electrical', 'Electrical'),
+        ('board', 'Board'),
+    ]
 
     part_number = models.CharField(max_length=50)
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    item_class = models.CharField(max_length=20, choices=CLASS_CHOICES, default='electrical')  # New field
     description = models.TextField(blank=True, null=True)
     total_stock = models.IntegerField(default=0)
 

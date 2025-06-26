@@ -253,7 +253,7 @@
         }
     
         /* Theme Toggle */
-        .theme-toggle {
+         .theme-toggle {
             position: fixed;
             bottom: 30px;
             right: 30px;
@@ -271,10 +271,29 @@
             z-index: 100;
             transition: all 0.3s ease;
         }
-    
+
         .theme-toggle:hover {
             transform: translateY(-3px);
             box-shadow: var(--shadow-lg);
+        }
+
+        .theme-toggle i {
+            font-size: 20px;
+            transition: transform 0.5s ease;
+        }
+        .theme-toggle {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        @media (max-width: 768px) {
+            .theme-toggle {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
         }
         
         .movement-selector {
@@ -420,9 +439,11 @@
     <div class="container">
         <header class="page-header">
             <div class="header-content">
-                <div class="header-icon">
-                    <i class="fas fa-exchange-alt"></i>
-                </div>
+                <a href="{% url 'inventory_list' %}" >
+                    <div class="header-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                </a>
                 <div class="page-title">
                     <h1>Stock Movement</h1>
                     <p class="page-subtitle">Register inward or outward movement of inventory items</p>
@@ -679,6 +700,8 @@
             const themeToggle = document.getElementById('themeToggle');
             const themeIcon = themeToggle.querySelector('i');
             const htmlElement = document.documentElement;
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.querySelector('.sidebar');
 
             // Check for saved theme preference or use preferred color scheme
             const savedTheme = localStorage.getItem('theme');

@@ -71,7 +71,7 @@ def add_inventory_item(request):
 
 @login_required
 def inventory_list(request):
-    items = InventoryItem.objects.all()
+    items = InventoryItem.objects.all().order_by('-id')
     raw_materials_count = InventoryItem.objects.filter(category='components').count()
     sensors_count = InventoryItem.objects.filter(category='built_equipment').count()
     
@@ -136,6 +136,7 @@ def sensor_build(request):
     if request.method == 'POST':
         sensor_name = request.POST['sensor_name']
         part_number = request.POST['part_number']
+        item_class = request.POST['item_class'] 
         components = request.POST.getlist('components')
         quantities = request.POST.getlist('quantities')
         number_of_sensors = int(request.POST['number_of_sensors'])
@@ -155,6 +156,7 @@ def sensor_build(request):
             new_sensor = InventoryItem.objects.create(
                 part_number=part_number,
                 name=sensor_name,
+                item_class=item_class,
                 category='built_equipment',
                 description='',
                 total_stock=number_of_sensors  # Set the correct stock immediately
@@ -346,7 +348,7 @@ def generate_pdf(request):
     
     # Create table data with more detailed information
     data = [
-        ['Part Number', 'Item Name', 'Category', 'Stock Level', 'Status']
+        ['Part Number', 'Item Name', 'Category','Class', 'Stock Level', 'Status']
     ]
     
     for item in items:
@@ -368,6 +370,7 @@ def generate_pdf(request):
             item.part_number,
             item.name,
             item.get_category_display(),
+            item.get_item_class_display(), 
             str(item.total_stock),
             stock_status
         ])
@@ -586,7 +589,7 @@ def export_to_excel(request):
     sheet.title = "Inventory Report"
 
     # Add header row
-    headers = ["Part Number", "Item Name", "Category", "Stock Level", "Status"]
+    headers = ["Part Number", "Item Name", "Category","Class", "Stock Level", "Status"]
     header_font = Font(bold=True)
     for col_num, header in enumerate(headers, 1):
         cell = sheet.cell(row=1, column=col_num)
@@ -613,6 +616,7 @@ def export_to_excel(request):
         sheet.cell(row=row_num, column=1).value = item.part_number
         sheet.cell(row=row_num, column=2).value = item.name
         sheet.cell(row=row_num, column=3).value = item.get_category_display()
+        sheet.cell(row=row_num, column=4).value = item.get_item_class_display() 
         sheet.cell(row=row_num, column=4).value = item.total_stock
         sheet.cell(row=row_num, column=5).value = stock_status
 

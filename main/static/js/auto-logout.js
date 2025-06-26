@@ -1,22 +1,43 @@
 /**
  * Auto Logout Script
  * This script handles automatic logout after a period of inactivity.
+ * Improved version with better error handling, logging, and prevention of multiple initializations.
  */
 
 function setupAutoLogout() {
+    // Prevent multiple initializations
+    if (window.autoLogoutInitialized) {
+        console.log("Auto logout already initialized, skipping duplicate initialization");
+        return;
+    }
+    window.autoLogoutInitialized = true;
+    
+    console.log("Setting up auto logout system at:", new Date().toISOString());
+    
     let inactivityTimer;
     const inactivityLimit = 60 * 60 * 1000; // 60 minutes of inactivity
     const warningTime = 5 * 60 * 1000; // 5 minutes before logout
+    
+    // Create a timestamp to track when the session should expire
+    let sessionExpireTime = Date.now() + inactivityLimit;
 
-    // Function to reset the timer
-    function resetTimer() {
+    // Function to reset the timer with better logging
+    function resetTimer(eventType) {
         clearTimeout(inactivityTimer);
-        // Set timer to show warning 30 seconds before logout
+        sessionExpireTime = Date.now() + inactivityLimit;
+        
+        if (eventType) {
+            console.log(`Activity detected (${eventType}). Session timer reset.`);
+        }
+        
+        // Set timer to show warning before logout
         inactivityTimer = setTimeout(showWarning, inactivityLimit - warningTime);
     }
     
     // Function to show the warning dialog
     function showWarning() {
+        console.log("Showing timeout warning at:", new Date().toISOString());
+        
         // Create warning dialog if it doesn't exist
         if (!document.getElementById('timeout-warning')) {
             const warningDiv = document.createElement('div');
@@ -49,6 +70,8 @@ function setupAutoLogout() {
             
             // Stay logged in button
             document.getElementById('stay-logged-in').addEventListener('click', function() {
+                console.log("User clicked 'Stay Logged In' button");
+                
                 // Make an AJAX request to refresh the session
                 fetch('/refresh-session/', {
                     method: 'POST',
@@ -60,21 +83,33 @@ function setupAutoLogout() {
                 })
                 .then(response => {
                     if (response.ok) {
+                        console.log("Session refreshed successfully");
                         // Hide the warning
                         document.getElementById('timeout-warning').style.display = 'none';
                         // Reset the timer
-                        resetTimer();
+                        resetTimer('manual-refresh');
+                    } else {
+                        console.error("Failed to refresh session:", response.status);
+                        // Try to reset timer anyway
+                        resetTimer('manual-refresh-fallback');
                     }
+                })
+                .catch(error => {
+                    console.error("Error refreshing session:", error);
+                    // Still hide dialog and reset timer as fallback
+                    document.getElementById('timeout-warning').style.display = 'none';
+                    resetTimer('manual-refresh-error-fallback');
                 });
             });
             
             // Logout now button
             document.getElementById('logout-now').addEventListener('click', function() {
+                console.log("User clicked 'Logout Now' button");
                 window.location.href = '/logout/';
             });
             
             // Start the countdown
-            let secondsLeft = 5 * 60; // 5 minutes countdown
+            let secondsLeft = Math.floor(warningTime / 1000);
             const countdownElement = document.getElementById('timeout-countdown');
             
             const updateCountdown = function() {
@@ -83,6 +118,7 @@ function setupAutoLogout() {
                 countdownElement.textContent = `Session expires in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
                 
                 if (secondsLeft <= 0) {
+                    console.log("Countdown complete, logging out user");
                     // Redirect to logout
                     window.location.href = '/logout/';
                 } else {
@@ -93,6 +129,7 @@ function setupAutoLogout() {
             
             updateCountdown();
         } else {
+            console.log("Warning dialog already exists, making visible");
             document.getElementById('timeout-warning').style.display = 'block';
         }
     }
@@ -113,16 +150,32 @@ function setupAutoLogout() {
         return cookieValue;
     }
     
+    // Activity detection function with event type tracking
+    function activityDetected(event) {
+        resetTimer(event.type);
+    }
+    
     // Watch for mouse, keyboard, or touch events to reset the timer
-    window.addEventListener('mousemove', resetTimer);
-    window.addEventListener('mousedown', resetTimer);
-    window.addEventListener('keypress', resetTimer);
-    window.addEventListener('scroll', resetTimer);
-    window.addEventListener('touchmove', resetTimer);
+    window.addEventListener('mousemove', activityDetected);
+    window.addEventListener('mousedown', activityDetected);
+    window.addEventListener('keypress', activityDetected);
+    window.addEventListener('scroll', activityDetected);
+    window.addEventListener('touchmove', activityDetected);
     
     // Initialize the timer when the page loads
-    resetTimer();
+    console.log("Initializing auto-logout timer. Session will expire at:", 
+                new Date(sessionExpireTime).toISOString());
+    resetTimer('initial');
 }
 
 // Call the setup function when the document is loaded
-document.addEventListener('DOMContentLoaded', setupAutoLogout);
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, setting up auto-logout system");
+    setupAutoLogout();
+});
+
+// Add backup initialization in case the DOMContentLoaded event already fired
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    console.log("Document already loaded, setting up auto-logout system as fallback");
+    setTimeout(setupAutoLogout, 100);
+}

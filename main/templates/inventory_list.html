@@ -181,6 +181,64 @@
             gap: 12px;
         }
         
+
+        /* Add to the style section */
+        .filter-controls {
+        margin-top: 16px;
+        margin-left: 24px; /* Match the table cell padding */
+        padding-right: 24px; /* Balance the right side as well */
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-bottom: 12px;
+    }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            background-color: var(--hover-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--border-lighter);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+
+
+
+
+
+
+
+
         .avatar {
             width: 36px;
             height: 36px;
@@ -513,8 +571,8 @@
         /* Action buttons */
         .action-buttons {
             display: flex;
-            gap: 8px;
-            justify-content: flex-end;
+            align-items: center;
+            margin-left: 85px;
         }
         
         .btn-icon {
@@ -1048,10 +1106,26 @@
         font-size: 18px;
     }
 
+    .item-class-mechanical {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: var(--success);
+    }
+
+    .item-class-electrical {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: var(--primary);
+    }
+
+    .item-class-board {
+        background-color: rgba(124, 58, 237, 0.15);
+        color: var(--secondary);
+    }
     @keyframes messageSlideIn {
         from { opacity: 0; transform: translateX(50px); }
         to { opacity: 1; transform: translateX(0); }
     }
+
+
     </style>
 </head>
 <body>
@@ -1070,6 +1144,12 @@
                 <li><a href="{% url 'deployed_sensors' %}"><i class="fas fa-satellite-dish"></i> Deployments</a></li>
                 <li><a href="{% url 'sensor_build' %}"><i class="fas fa-cogs"></i> Production</a></li>
                 <!-- <li><a href="#"><i class="fas fa-users"></i> User Management</a></li> -->
+                <li><a href="{% url 'add_inventory_item' %}" >
+                    <i class="fas fa-plus"></i> Add New Item
+                </a></li>
+                <li><a href="{% url 'sensor_build' %}" >
+                    <i class="fas fa-cogs"></i> Build Equipment
+                </a></li>
 
                 <li class="dropdown-container">
                     <a href="#" class="dropdown-toggle">
@@ -1175,7 +1255,18 @@
                         <input type="text" placeholder="Search items..." id="inventorySearch" onkeyup="filterItems()">
                     </div>
                 </div>
-                
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <label>Filter by Class:</label>
+                        <div class="filter-options">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="mechanical">Mechanical</button>
+                            <button class="filter-btn" data-filter="electrical">Electrical</button>
+                            <button class="filter-btn" data-filter="board">Board</button>
+                        </div>
+                    </div>
+                </div>
+
                 <table>
                     <thead>
                         <tr>
@@ -1183,6 +1274,7 @@
                             <th width="15%">Part Number</th>
                             <th width="25%">Item Name</th>
                             <th width="15%">Category</th>
+                            <th width="10%">Class</th>
                             <th width="15%" style="text-align: left; cursor: pointer;" id="stockLevelHeading">
                                 Stock Level
                             </th>
@@ -1211,6 +1303,11 @@
                                 </span>
                             </td>
                             <td>
+                                <span class="category-pill item-class-{{ item.item_class }}">
+                                    {{ item.get_item_class_display }}
+                                </span>
+                            </td>
+                            <td>
                                 <div class="stock-level-container">
                                     {% with threshold=user_thresholds|get_item_threshold:item.id %}
                                     {% with low=threshold|get_low_threshold medium=threshold|get_medium_threshold %}
@@ -1229,17 +1326,18 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="#" class="btn-icon" title="Edit Item">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
                                     <a href="{% url 'stock_movement' %}" class="btn-icon" title="Move Stock">
                                         <i class="fas fa-exchange-alt"></i>
                                     </a>
-                                    {% if user.is_superuser %}
-                                    <a href="#" class="btn-icon btn-delete" title="Delete Item">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                    {% endif %}
+{#                                    <a href="#" class="btn-icon" title="Edit Item">#}
+{#                                        <i class="fas fa-edit"></i>#}
+{#                                    </a>#}
+
+{#                                    {% if user.is_superuser %}#}
+{#                                    <a href="#" class="btn-icon btn-delete" title="Delete Item">#}
+{#                                        <i class="fas fa-trash"></i>#}
+{#                                    </a>#}
+{#                                    {% endif %}#}
                                 </div>
                             </td>
                         </tr>
@@ -1278,9 +1376,9 @@
                 <a href="{% url 'sensor_build' %}" class="btn btn-secondary">
                     <i class="fas fa-cogs"></i> Build Equipment
                 </a>
-                <a href="{% url 'stock_list' %}" class="btn btn-outline">
-                    <i class="fas fa-exchange-alt"></i> Stock Movements
-                </a>
+{#                <a href="{% url 'stock_list' %}" class="btn btn-outline">#}
+{#                    <i class="fas fa-exchange-alt"></i> Stock Movements#}
+{#                </a>#}
                 <!-- <div class="dropdown-container">
                     <button class="btn btn-outline dropdown-toggle">
                         <i class="fas fa-file-export"></i> Export Data
@@ -1319,6 +1417,52 @@
                 }
             });
         }
+
+
+        function filterByClass(classFilter) {
+            const rows = document.querySelectorAll('#inventoryTable tr');
+            
+            rows.forEach(row => {
+                if (classFilter === 'all') {
+                    row.style.display = "";
+                } else {
+                    const itemClass = row.getAttribute('data-class');
+                    if (itemClass === classFilter) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup class filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Apply filter
+                    filterByClass(this.getAttribute('data-filter'));
+                });
+            });
+            
+            // Add data-class attribute to each row
+            document.querySelectorAll('#inventoryTable tr').forEach(row => {
+                const classPill = row.querySelector('.item-class-mechanical, .item-class-electrical, .item-class-board');
+                if (classPill) {
+                    const classValue = classPill.classList[1].replace('item-class-', '');
+                    row.setAttribute('data-class', classValue);
+                }
+            });
+        });
+
+
+
     </script>
     <script>
         // Theme Toggle and Stock Level Threshold Functionality
@@ -1622,6 +1766,9 @@
                 });
             });
         });
+
+
+        
 
     </script>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
